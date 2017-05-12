@@ -32,6 +32,7 @@
 \usepackage{minted}
 \usepackage{tabularx}
 
+\definecolor{lightgray}{gray}{0.9}
 \pretitle{%
   \begin{center}
   \LARGE
@@ -252,7 +253,7 @@ In order to run simulation in GOMC, the following files need to be provided:
 \item PSF file(s)
 \item Parameter file
 \end{itemize}
-\subsection{PDB}
+\subsection{PDB File}
 The PDB file stores coordinates for the simulation. The file format is widely adopted.
 \begin{itemize}
 \item Protein Databank (PDB) Files (plural: PDB files)
@@ -307,6 +308,64 @@ A few important \colorbox{yellow}{Notes}/\colorbox{red}{Warnings} on Undocumente
 \item As the x, y, and z coordinates are fixed point with only three digits of precision, the energy values you get when restarting may be mildly different, particularly for bonded interactions due to roundoff in the coordinates.  This will eventually be remedied by the implementation of a full-precision trajectory (e.g. DCD) file.
 \item The ``ISB" entry in columns 73-75 is not an official part of the PDB standard.  This is a proprietary entry called ``Segname", which has been embraced by NAMD and some other codes.
 \end{itemize}
+A frame in the PDB file is terminated with the keyword \texttt{END}.\\With that overview of the format in mind, the following steps describe how a PDB file is typically built.\\
+\begin{enumerate}
+\item A single molecule PDB is obtained. In this example, the QM software package Gaussian was used to draw the molecule, which was then edited by hand to adhere to the PDB spec properly. The end result is a PDB for a single molecule:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{*9l }
+  \texttt{REMARK} & \multicolumn{8}{l}{\texttt{1 File created by GaussView 5.0.8}}  \\
+  \texttt{ATOM} & \texttt{1} & \texttt{C1} & \texttt{ISB} & \texttt{1} & \texttt{0.911} & \texttt{-0.313} & \texttt{0.000} & \texttt{C} \\
+  \texttt{ATOM} & \texttt{2} & \texttt{C2} & \texttt{ISB} & \texttt{1} & \texttt{1.424} & \texttt{-1.765} & \texttt{0.000} & \texttt{C} \\
+  \texttt{ATOM} & \texttt{3} & \texttt{C3} & \texttt{ISB} & \texttt{1} & \texttt{-0.629} & \texttt{-0.313} & \texttt{0.000} & \texttt{C} \\
+  \texttt{ATOM} & \texttt{4} & \texttt{C4} & \texttt{ISB} & \texttt{1} & \texttt{1.424} & \texttt{0.413} & \texttt{-1.257} & \texttt{C} \\
+  \multicolumn{9}{l}{\texttt{END}} \\
+\end{tabular}
+}
+\item Next, packings are calculated to place the simulation in a region of vapor-liquid coexistence. There are a couple of ways to do this in Gibbs ensemble:
+\begin{itemize}
+\item Pack both boxes to a single ?middle? density, which is an average of the liquid and vapor densities.
+\item Same as 1, but add a modest amount to axis of one box (e.g. 10-30 A).  This technique can be handy in the constant pressure Gibbs ensemble.
+\item Pack one box to the predicted liquid density and the other to the vapor density.
+\end{itemize}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=1.0]{images/pack2}
+\end{figure}
+A good reference for getting the information needed to estimate packing is the NIST Web Book database of pure compounds:\\\\\url{http://webbook.nist.gov/chemistry/}\\\\\item After packing is determined, a basic pack can be performed with a Packmol script.  Here is one example:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{tolerance 3.0}\\\texttt{filetype pdb}\\\texttt{output STEP2\_ISB\_packed\_BOX\_0.pdb}\\\\\texttt{structure isobutane.pdb}\\\texttt{number 1000}\\\texttt{inside box 0.1 0.1 0.1 70.20 70.20 70.20}\\\texttt{end structure}
+\end{tabular}
+}\\\\
+Packmol scripts are typically saved with the extension \texttt{*.inp}, so this might be named ``\texttt{pack\_isobutane.inp}".\\To run the script, we type the following line into the terminal:\\\\
+\texttt{\$ ./packmol < pack\_isobutane.inp}\\\\
+\end{enumerate}
+\subsection{PSF File}
+The PSF file stores the topology, mass, charges, and atom identities of molecules in the system.\begin{itemize}
+\item Protein Structure File (PSF) \item Space-separated file\item Used by NAMD, CHARMM, X-PLOR
+\end{itemize}The PSF file is not as robustly documented as the PDB format, but a basic description of it can be found here:\\\\\url{http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node24.html}\\\\The PSF file is generally composed of a series of sections. A line with a numeric value is typically at the top of each section. This value lists the number of entries in that section (lines can contain multiple entries; a dihedral, for example has two quadruplet entries of atom indices per line). Note that outside the remarks and atom section, this number is typically smaller than the number of lines by a factor of 2 to 4.\\\\PSF files always start with the string ``PSF" on their first line.\\\\GOMC reuses PSF reading code from NAMD, hence it should have much of the same flexibility and limitations.  By section, the segments of a PSF file are:
+\begin{itemize}
+\item TITLE: remarks on the file
+\item BONDS: the bonds (if applicable) in molecules \item ANGLE: the bonds (if applicable) in molecules\item DIHEDRAL: the bonds (if applicable) in molecules\item IMPROPER: the bonds (if applicable) in molecules\item (other sections such as cross terms)
+\end{itemize}The code currently skips the title section and reads the bonds, angles, dihedrals and impropers.\\\\
+A few important \colorbox{yellow}{Notes}/\colorbox{red}{Warnings}:
+\begin{itemize}\item The PSF file format is a highly redundant file format.  It repeats identical topology of thousands of molecules of a common kind in some cases. GOMC follows the same approach as NAMD, allowing this excess information externally and compiling it in the code.\item Other sections (e.g. cross terms) contain unsupported or legacy parameters and are ignored.\item Following the restrictions of VMD, the order of the PSF atoms must match the order in the PDB file.\item Improper entries are read and stored, but are not currently used.  Support will eventually be added for this.
+\end{itemize}The PSF file is typically generated using PSFGen. It is convenient to make a script, such as the example below, to do this:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{psfgen << ENDMOL}\\\texttt{topology ./Top\_branched\_Alaknes.inp}\\\texttt{segment ISB\{}\\\texttt{    pdb ./STEP2\_ISB\_packed\_BOX\_0.pdb}\\\texttt{    first none}\\\texttt{    last none}\\\texttt{\}}\\\\\texttt{coordpdb ./STEP2\_ISB\_packed\_BOX\_0.pdb ISB}\\\\\texttt{writepsf ./STEP3\_START\_ISB\_sys\_BOX\_0.psf}\\\texttt{writepdb ./STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\
+\end{tabular}
+}\\\\
+Typically, one script is run per box to generate a finalized PDB/PSF for that box. The script requires one additional file, the NAMD-style topology file. While GOMC does not directly read or interact with this file, it's typically used to generate the PSF and, hence, is considered one of the integral file types. It will be briefly discussed in the following section.\\\\Here's a peek at how the generated PSF file looks for a packed isobutane system (abridged):\\\\
+\colorbox{lightgray}{
+\begin{tabular}{r l l l l l l l l}\multicolumn{9}{l}{\texttt{PSF}}\\
+\texttt{3} & \multicolumn{8}{l}{\texttt{!NTITLE}} \\\texttt{REMARKS} & \multicolumn{8}{l}{\texttt{original generated structure x-plor psf file}}\\\texttt{REMARKS} & \multicolumn{8}{l}{\texttt{topology ./Top\_Branched\_Alkanes.inp}}\\\texttt{REMARKS} & \multicolumn{8}{l}{\texttt{segment ISB \{ first NONE; last NONE; auto angles dihedrals \}}}\\\\\texttt{4000} & \multicolumn{8}{l}{\texttt{!NATOM}}\\\texttt{1} & \texttt{ISB} & \texttt{1} & \texttt{ISB} & \texttt{C1} & \texttt{CH1} & \texttt{0.000000} & \texttt{13.0190} & \texttt{0}\\\texttt{2} & \texttt{ISB} & \texttt{1} & \texttt{ISB} & \texttt{C2} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{3} & \texttt{ISB} & \texttt{1} & \texttt{ISB} & \texttt{C3} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{4} & \texttt{ISB} & \texttt{1} & \texttt{ISB} & \texttt{C4} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{5} & \texttt{ISB} & \texttt{2} & \texttt{ISB} & \texttt{C1} & \texttt{CH1} & \texttt{0.000000} & \texttt{13.0190} & \texttt{0}\\\texttt{6} & \texttt{ISB} & \texttt{2} & \texttt{ISB} & \texttt{C2} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{7} & \texttt{ISB} & \texttt{2} & \texttt{ISB} & \texttt{C3} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{8} & \texttt{ISB} & \texttt{2} & \texttt{ISB} & \texttt{C4} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\multicolumn{9}{l}{\texttt{.}}\\\multicolumn{9}{l}{\texttt{.}}\\\multicolumn{9}{l}{\texttt{.}}\\\texttt{3997} & \texttt{ISB} & \texttt{1000} & \texttt{ISB} & \texttt{C1} & \texttt{CH1} & \texttt{0.000000} & \texttt{13.0190} & \texttt{0}\\\texttt{3998} & \texttt{ISB} & \texttt{1000} & \texttt{ISB} & \texttt{C2} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{3999} & \texttt{ISB} & \texttt{1000} & \texttt{ISB} & \texttt{C3} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\\texttt{4000} & \texttt{ISB} & \texttt{1000} & \texttt{ISB} & \texttt{C4} & \texttt{CH3} & \texttt{0.000000} & \texttt{15.0350} & \texttt{0}\\
+
+\end{tabular}
+}\\\\
+
+
+
 
 
 
