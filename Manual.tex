@@ -471,9 +471,15 @@ Here's a peek at how the generated PSF file looks for a packed isobutane system 
 \end{tabular}
 }\\\\
 \subsection{Topology File}
-The topology is a whitespace separated file format, which contains a list of atoms and  their corresponding masses, and a list of residue information (charges, composition, and topology). Essentially, it is a non-redundant lookup table equivalent to the PSF file.\\\\This is followed by a series of residues, which tell PSFGen what atoms are bonded to a given atom. Each residue is comprised of four key elements:
-\begin{itemize}\item A header beginning with the keyword RESI with the residue name and net charge\item A body with multiple ATOM entries (not to be confused with the PDB-style entries of the same name), which list the partial charge on the particle and what kind of atom each named atom in a specific molecule/residue is.\item A section of lines starting with the word BOND contains pairs of bonded atoms (typically 3 per line)\item A closing section with instructions for PSFGen.
-\end{itemize}Here's an example of a residue definition for isobutane:\\\\
+The topology is a whitespace separated file format, which contains a list of atoms and  their corresponding masses, and a list of residue information (charges, composition, and topology). Essentially, it is a non-redundant lookup table equivalent to the PSF file.\\\\
+This is followed by a series of residues, which tell PSFGen what atoms are bonded to a given atom. Each residue is comprised of four key elements:
+\begin{itemize}
+\item A header beginning with the keyword RESI with the residue name and net charge
+\item A body with multiple ATOM entries (not to be confused with the PDB-style entries of the same name), which list the partial charge on the particle and what kind of atom each named atom in a specific molecule/residue is.
+\item A section of lines starting with the word BOND contains pairs of bonded atoms (typically 3 per line)
+\item A closing section with instructions for PSFGen.
+\end{itemize}
+Here's an example of a residue definition for isobutane:\\\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
 \texttt{RESI ISB ~~ 0.00 ! isobutane - TraPPE}\\
@@ -505,20 +511,35 @@ Here's a full parameter file prepared to pack a system of isobutane:\\\\
 \texttt{PATCHING FIRS NONE LAST NONE}\\\\
 \texttt{END}
 \end{tabular}}\\\\
-Note that the keyword \texttt{END} must be used to terminate this file and keywords related to the auto-generation process must be placed near the top of the file, after the MASS definitions.\\\\More in-depth information can be found in the following links:\\``Topology Tutorial" (PDF, in-depth)\\\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-tutorial.pdf}\\``NAMD Tutorial: 4. Examining the Topology File"\\\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-html/node4.html}\\``Developing Topology and Parameter Files"\\\url{http://www.ks.uiuc.edu/Training/Tutorials/science/force field-tutorial/force field-html/node6.html}\\``NAMD Tutorial: 25. Topology Files"\\\url{http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node25.html}
+Note that the keyword \texttt{END} must be used to terminate this file and keywords related to the auto-generation process must be placed near the top of the file, after the MASS definitions.\\\\
+More in-depth information can be found in the following links:\\
+``Topology Tutorial" (PDF, in-depth)\\
+\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-tutorial.pdf}\\
+``NAMD Tutorial: 4. Examining the Topology File"\\
+\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-html/node4.html}\\
+``Developing Topology and Parameter Files"\\
+\url{http://www.ks.uiuc.edu/Training/Tutorials/science/force field-tutorial/force field-html/node6.html}\\
+``NAMD Tutorial: 25. Topology Files"\\
+\url{http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node25.html}
 
 \colorbox{yellow}{\texttt{NOTE:}} Links are courtesy of UIUC.\\
 \subsection{Parameter File(s):}
 Currently, GOMC uses a single parameter file and the user has the two kinds of parameter file choices:
-\begin{itemize}\item ``\texttt{CHARMM}" (Chemistry at Harvard Molecular Mechanics) compatible parameter file\item ``\texttt{EXOTIC}" parameter file
-\end{itemize}If the parameter file type is not specified or if the chosen file is missing, an error will result.\\Both force field file options are whitespace separated files with sections preceded by a tag. When a known tag (representing a molecular interaction in the model) is encountered, reading of that section of the force field begins.  Comments (anything after a * or !) and whitespace are ignored. Reading concludes when the end of the file is reached or another section tag is encountered.\\\\
+\begin{itemize}
+\item ``\texttt{CHARMM}" (Chemistry at Harvard Molecular Mechanics) compatible parameter file
+\item ``\texttt{EXOTIC}" parameter file
+\end{itemize}
+If the parameter file type is not specified or if the chosen file is missing, an error will result.\\
+Both force field file options are whitespace separated files with sections preceded by a tag. When a known tag (representing a molecular interaction in the model) is encountered, reading of that section of the force field begins.  Comments (anything after a * or !) and whitespace are ignored. Reading concludes when the end of the file is reached or another section tag is encountered.\\\\
 \underline{CHARMM format parameter file}\\
-\texttt{CHARMM} contains a widely used model for describing energies in Monte Carlo and molecular dynamics simulations. It is intended to be compatible with other codes that use such a format, such as \texttt{NAMD}.For a general overview of the \texttt{CHARMM} force field, see:\\\url{http://www.charmmtutorial.org/index.php/The_Energy_Function}\\\\Here's the basic \texttt{CHARMM} contributions that are supported in GOMC:
+\texttt{CHARMM} contains a widely used model for describing energies in Monte Carlo and molecular dynamics simulations. It is intended to be compatible with other codes that use such a format, such as \texttt{NAMD}.
+For a general overview of the \texttt{CHARMM} force field, see:\\
+\url{http://www.charmmtutorial.org/index.php/The_Energy_Function}\\\\
+Here's the basic \texttt{CHARMM} contributions that are supported in GOMC:
 
 \begin{align*}
-U_{bond}&=\sum_{bonds} K_b(b-b^0)^2 & U_{LJ} &=\sum_{nonb,pairs} \epsilon_{ij}\left[\left(\frac{r_{ij}^{min}}{r_{ij}}\right)^{12}-2\left(\frac{r_{ij}^{min}}{r_{ij}}\right)^6\right] \\
-U_{angle}&=\sum_{angles} K_{\theta}(\theta-\theta^0)^2 & U_{LJ} &=\sum_{elec} \frac{q_i q_j}{4\pi \epsilon r_{ij}} \\
-U_{dihedral}&=\sum_{dihedrals} K_{\phi} (1+\cos(n\phi - \delta))
+U_{\texttt{bond}}&=\sum_{\texttt{bonds}} K_b(b-b_0)^2 & U_{\texttt{dihedral}}&=\sum_{\texttt{dihedrals}} K_{\phi} [1+\cos(n\phi - \delta)]\\
+U_{\texttt{angle}}&=\sum_{\texttt{angles}} K_{\theta}(\theta-\theta_0)^2 & U_{\texttt{LJ}} &=\sum_{\texttt{nonbonded}} \epsilon_{ij}\left[\left(\frac{R_{min_{ij}}}{r_{ij}}\right)^{12}-2\left(\frac{R_{min_{ij}}}{r_{ij}}\right)^6\right]+ \frac{q_i q_j}{\epsilon r_{ij}} \\
 \end{align*}
 
 As seen above, the following are recognized, read and used:
@@ -568,37 +589,99 @@ As seen above, the following are recognized, read and used:
 \colorbox{yellow}{\texttt{NOTE:}} Please pay attention that in this section we define minimum radius, not (minimum radius)/2 as it is defined in the \texttt{NONBONDED} section.
 \end{itemize}
 Currently, supported sections of the \texttt{CHARMM} compliant file include \texttt{BONDS}, \texttt{ANGLES}, \texttt{DIHEDRALS}, \texttt{NONBONDED}, \texttt{NBFIX}. Other sections such as \texttt{CMAP} are not currently read or supported.\\
-\end{itemize}\subsubsection{BONDS}
+\end{itemize}
+\subsubsection{BONDS}
 (``bond stretching") is one key section of the \texttt{CHARMM}-compliant file. Units for the \texttt{$K_b$} variable in this section are in kcal/mol; the \texttt{$b_0$} section (which represents the equilibrium bond length for that kind of pair) is measured in Angstroms.\\\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
-\texttt{BONDS}\\\texttt{!V(bond) = Kb(b - b0)**2}\\\texttt{!}\\\texttt{!Kb: kcal/mole/A**2}\\\texttt{!b0: A}\\\texttt{!}\\\texttt{! Kb (kcal/mol) = Kb (K) * Boltz. const.; }\\\texttt{!}\\\texttt{!atom type     Kb              b0        description}\\\texttt{CH3 CH1        9999999999      1.540   ! TraPPE 2}\\
-\end{tabular}}\\\\\colorbox{yellow}{\texttt{NOTE:}} The \texttt{$K_b$} value may appear odd, but this is because a larger value corresponds to a more rigid bond. As Monte Carlo force fields (e.g. \texttt{TraPPE}) typically treat molecules as rigid constructs, \texttt{$K_b$} is set to a large value - 9999999999. Sampling bond stretch is not supported in GOMC.\\\\
+\texttt{BONDS}\\
+\texttt{!V(bond) = Kb(b - b0)**2}\\
+\texttt{!}\\
+\texttt{!Kb: kcal/mole/A**2}\\
+\texttt{!b0: A}\\
+\texttt{!}\\
+\texttt{! Kb (kcal/mol) = Kb (K) * Boltz. const.; }\\
+\texttt{!}\\
+\texttt{!atom type     Kb              b0        description}\\
+\texttt{CH3 CH1        9999999999      1.540   ! TraPPE 2}\\
+\end{tabular}}\\\\
+\colorbox{yellow}{\texttt{NOTE:}} The \texttt{$K_b$} value may appear odd, but this is because a larger value corresponds to a more rigid bond. As Monte Carlo force fields (e.g. \texttt{TraPPE}) typically treat molecules as rigid constructs, \texttt{$K_b$} is set to a large value - 9999999999. Sampling bond stretch is not supported in GOMC.\\\\
 \subsubsection{ANGLES}
-(``bond bending"), where \texttt{$\theta$} and \texttt{$\theta_0$} are commonly measured in degrees and \texttt{$K_{\theta}$} is measured in kcal/mol/K.  These values, in literature, are often expressed in Kelvin (K). To convert Kelvin to kcal/mol/K, multiply by the Boltzmann constant -- \texttt{$K_b$} , 0.0019872041 kcal/mol. In order to fix the angle, it requires to set a large value for \texttt{$K_{\theta}$}. By assigning a large value like 9999999999, specified angle will be fixed and energy of that angle will considered to be zero.\\\\Here is an example of what is necessary for isobutane:\\
-\colorbox{lightgray}{\begin{tabular}{l}
-\texttt{ANGLES}\\\texttt{!}\\\texttt{!V(angle) = Ktheta(Theta - Theta0)**2}\\\texttt{!}\\\texttt{!V(Urey-Bradley) = Kub(S - S0)**2}\\\texttt{!}\\\texttt{!Ktheta: kcal/mole/rad**2}\\\texttt{!Theta0: degrees}\\\texttt{!S0: A}\\\texttt{!}\\\texttt{! Ktheta (kcal/mol) = Ktheta (K) * Boltz. const.}\\\texttt{!}\\\texttt{!atom types         Ktheta       Theta0   Kub(?)  S0(?)}\\\texttt{CH3 CH1 CH3         62.100125    112.00 ! TraPPE 2}\\
+(``bond bending"), where \texttt{$\theta$} and \texttt{$\theta_0$} are commonly measured in degrees and \texttt{$K_{\theta}$} is measured in kcal/mol/K.  These values, in literature, are often expressed in Kelvin (K). To convert Kelvin to kcal/mol/K, multiply by the Boltzmann constant -- \texttt{$K_b$} , 0.0019872041 kcal/mol. In order to fix the angle, it requires to set a large value for \texttt{$K_{\theta}$}. By assigning a large value like 9999999999, specified angle will be fixed and energy of that angle will considered to be zero.\\\\
+Here is an example of what is necessary for isobutane:\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{ANGLES}\\
+\texttt{!}\\
+\texttt{!V(angle) = Ktheta(Theta - Theta0)**2}\\
+\texttt{!}\\
+\texttt{!V(Urey-Bradley) = Kub(S - S0)**2}\\
+\texttt{!}\\
+\texttt{!Ktheta: kcal/mole/rad**2}\\
+\texttt{!Theta0: degrees}\\
+\texttt{!S0: A}\\
+\texttt{!}\\
+\texttt{! Ktheta (kcal/mol) = Ktheta (K) * Boltz. const.}\\
+\texttt{!}\\
+\texttt{!atom types         Ktheta       Theta0   Kub(?)  S0(?)}\\
+\texttt{CH3 CH1 CH3         62.100125    112.00 ! TraPPE 2}\\
 \end{tabular}}\\\\
 Some CHARMM \texttt{ANGLES} section entries include Urey-Bradley potentials (\texttt{$K_{ub}$}, \texttt{$b_{ub}$}), in addition to the standard quadratic angle potential. The constants related to this potential function are currently read, but the logic has not been added to calculate this potential function. Support for this potential function will be added in later versions of the code.\\\\
-The final major bonded interactions section of the \texttt{CHARMM} compliant parameter file are the \texttt{DIHEDRALS}. Each dihedral is composed of a dihedral series of 1 or more terms. Often, there are 4 to 6 terms in a dihedral. Angles for the dihedrals' deltas are given in degrees.\\Since isobutane has no dihedral, here are the parameters pertaining to 2,3-dimethylbutane:\\\\
-\colorbox{lightgray}{\begin{tabular}{l}
-\texttt{DIHEDRALS}\\\texttt{!}\\\texttt{!V(dihedral) = Kchi(1 + cos(n(chi) - delta))}\\\texttt{!}\\\texttt{!Kchi: kcal/mole}\\\texttt{!n: multiplicity}\\\texttt{!delta: degrees}\\\texttt{!}\\\texttt{! Kchi (kcal/mol) = Kchi (K) * Boltz. const.}\\\texttt{!}\\\texttt{!atom types         Kchi        n    delta              description}\\\texttt{X   CH1 CH1 X      -0.498907    0      0.0              ! TraPPE 2}\\\texttt{X   CH1 CH1 X       0.851974    1      0.0              ! TraPPE 2}\\\texttt{X   CH1 CH1 X      -0.222269    2    180.0              ! TraPPE 2}\\\texttt{X   CH1 CH1 X       0.876894    3      0.0              ! TraPPE 2}\\
+The final major bonded interactions section of the \texttt{CHARMM} compliant parameter file are the \texttt{DIHEDRALS}. Each dihedral is composed of a dihedral series of 1 or more terms. Often, there are 4 to 6 terms in a dihedral. Angles for the dihedrals' deltas are given in degrees.\\
+Since isobutane has no dihedral, here are the parameters pertaining to 2,3-dimethylbutane:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{DIHEDRALS}\\
+\texttt{!}\\
+\texttt{!V(dihedral) = Kchi(1 + cos(n(chi) - delta))}\\
+\texttt{!}\\
+\texttt{!Kchi: kcal/mole}\\
+\texttt{!n: multiplicity}\\
+\texttt{!delta: degrees}\\
+\texttt{!}\\
+\texttt{! Kchi (kcal/mol) = Kchi (K) * Boltz. const.}\\
+\texttt{!}\\
+\texttt{!atom types         Kchi        n    delta              description}\\
+\texttt{X   CH1 CH1 X      -0.498907    0      0.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X       0.851974    1      0.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X      -0.222269    2    180.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X       0.876894    3      0.0              ! TraPPE 2}\\
 \end{tabular}}\\\\
 \colorbox{yellow}{\texttt{NOTE:}} The code allows the use of `X' to indicate ambiguous positions on the ends. This is useful because this kind is often determined solely by the two middle atoms in the middle of the dihedral, according to literature.
 \subsubsection{IMPROPERS}
-Energy parameters used to describe out-of-plane rocking are currently read, but unused. The section is often blank. If it becomes necessary, algorithms to calculate the improper energy will need to be added.\\The next section of the \texttt{CHARMM} style parameter file is the \texttt{NONBONDED}. In order to use \texttt{TraPPE} this section of the \texttt{CHARMM} compliant file is critical. Here's an example with our isobutane potential model:\\\\
-\colorbox{lightgray}{\begin{tabular}{l}
-\texttt{NONBONDED }\\\texttt{!}\\\texttt{!V(Lennard-Jones) = Eps,i,j[(Rmin,i,j/ri,j)**12 - 2(Rmin,i,j/ri,j)**6]}\\\texttt{!}\\\texttt{!atom  ignored   epsilon     Rmin/2       ignored  eps,1-4  Rmin/2,1-4}\\\texttt{!}\\\texttt{CH3    0.0      -0.194745992  2.10461634058 0.0   0.0   0.0 ! TraPPE 1}\\\texttt{CH1    0.0      -0.019872040  2.62656119304 0.0   0.0   0.0! TraPPE 2}\\\texttt{End}\\
+Energy parameters used to describe out-of-plane rocking are currently read, but unused. The section is often blank. If it becomes necessary, algorithms to calculate the improper energy will need to be added.\\
+The next section of the \texttt{CHARMM} style parameter file is the \texttt{NONBONDED}. In order to use \texttt{TraPPE} this section of the \texttt{CHARMM} compliant file is critical. Here's an example with our isobutane potential model:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{NONBONDED }\\
+\texttt{!}\\
+\texttt{!V(Lennard-Jones) = Eps,i,j[(Rmin,i,j/ri,j)**12 - 2(Rmin,i,j/ri,j)**6]}\\
+\texttt{!}\\
+\texttt{!atom  ignored   epsilon     Rmin/2       ignored  eps,1-4  Rmin/2,1-4}\\
+\texttt{!}\\
+\texttt{CH3    0.0      -0.194745992  2.10461634058 0.0   0.0   0.0 ! TraPPE 1}\\
+\texttt{CH1    0.0      -0.019872040  2.62656119304 0.0   0.0   0.0! TraPPE 2}\\
+\texttt{End}\\
 \end{tabular}}\\\\
 \colorbox{yellow}{\texttt{NOTE:}} The \texttt{$R_{min}$} is different from \texttt{$\sigma$}. \texttt{$\sigma$} is the distance to the x-intercept (where interaction energy goes from being repulsive to positive). \texttt{$R_{min}$} is the potential well-depth, where the attraction is maximum. To convert \texttt{$\sigma$} to \texttt{$R_{min}$}, simply multiply \texttt{$\sigma$} by 0.56123102415, and flag it with a negative sign.\\
 The last section of the \texttt{CHARMM} style parameter file is the \texttt{NBFIX}. In this section, individual pair interaction will be modified. First, pseudo non-bonded parameters have to be defined in \texttt{NONBONDED} and modified in \texttt{NBFIX}. Here?s an example if it is required to modify interaction between \texttt{CH3} and \texttt{CH1} atoms:\\
 \colorbox{lightgray}{
-\begin{tabular}{l}\texttt{NBFIX }\\\texttt{!V(Lennard-Jones) = Eps,i,j[(Rmin,i,j/ri,j)**12 - 2(Rmin,i,j/ri,j)**6]}\\\texttt{!}\\\texttt{!atom  atom  epsilon      Rmin  eps,1-4  Rmin,1-4}\\\texttt{CH3   CH1    -0.294745992 1.10461634058 ! }\\\texttt{End}\\
+\begin{tabular}{l}
+\texttt{NBFIX }\\
+\texttt{!V(Lennard-Jones) = Eps,i,j[(Rmin,i,j/ri,j)**12 - 2(Rmin,i,j/ri,j)**6]}\\
+\texttt{!}\\
+\texttt{!atom  atom  epsilon      Rmin  eps,1-4  Rmin,1-4}\\
+\texttt{CH3   CH1    -0.294745992 1.10461634058 ! }\\
+\texttt{End}\\
 \end{tabular}}\\\\
 
-
-
-
+\subsubsection{Exotic Parameter file}
+The exotic file is intended for use with nonstandard/specialty models of molecular interaction, which are not included in \texttt{CHARMM} standard. Currently, two custom interaction are included:
+\begin{description}
+\item [NONBODED\_MIE] This section describes n-6 (Lennard-Jones) non-bonded interactions. The Lennard-Jones potential (12-6) is a subset of this potential. Non-bonded parameters are assigned by specifying atom type name followed by minimum energy, atom diameter, and repulsion exponent. In order to modify 1-4 interaction, a second minimum energy, atom diameter, and repulsion exponent need to be defined; otherwise, the same parameters would be considered for 1-4 interaction.
+\item [NBFIX\_MIE] This section allows n-6 (Lennard-Jones) interaction between two pairs of atoms to be modified. This is done by specifying two atoms type names followed by minimum energy, atom diameter, and repulsion exponent. In order to modify 1-4 interaction, a second minimum energy, atom diameter, and repulsion exponent need to be defined; otherwise, the same parameter will be considered for 1-4 interaction.
+\end{description}
+\colorbox{yellow}{\texttt{NOTE:}} In \texttt{EXOTIC} force field, the definition of atom diameter($\s$) is same for both NONBONDED_MIE and NBFIX_MIE.
 
 
 
