@@ -675,21 +675,170 @@ The last section of the \texttt{CHARMM} style parameter file is the \texttt{NBFI
 \texttt{End}\\
 \end{tabular}}\\\\
 
-\subsubsection{Exotic Parameter file}
+\subsection{Exotic Parameter file}
 The exotic file is intended for use with nonstandard/specialty models of molecular interaction, which are not included in \texttt{CHARMM} standard. Currently, two custom interaction are included:
 \begin{description}
 \item [NONBODED\_MIE] This section describes n-6 (Lennard-Jones) non-bonded interactions. The Lennard-Jones potential (12-6) is a subset of this potential. Non-bonded parameters are assigned by specifying atom type name followed by minimum energy, atom diameter, and repulsion exponent. In order to modify 1-4 interaction, a second minimum energy, atom diameter, and repulsion exponent need to be defined; otherwise, the same parameters would be considered for 1-4 interaction.
 \item [NBFIX\_MIE] This section allows n-6 (Lennard-Jones) interaction between two pairs of atoms to be modified. This is done by specifying two atoms type names followed by minimum energy, atom diameter, and repulsion exponent. In order to modify 1-4 interaction, a second minimum energy, atom diameter, and repulsion exponent need to be defined; otherwise, the same parameter will be considered for 1-4 interaction.
 \end{description}
-\colorbox{yellow}{\texttt{NOTE:}} In \texttt{EXOTIC} force field, the definition of atom diameter($\s$) is same for both NONBONDED_MIE and NBFIX_MIE.
-
-
-
-
-
-
-
-
+\colorbox{yellow}{\texttt{NOTE:}} In \texttt{EXOTIC} force field, the definition of atom diameter($\sigma$) is same for both \texttt{NONBONDED\_MIE} and \texttt{NBFIX\_MIE}.\\
+Otherwise, the exotic file reuses the same geometry section headings - \texttt{BONDS} / \texttt{ANGLES} / \texttt{DIHEDRALS} / etc. The only difference in these sections versus in the \texttt{CHARMM} format force field file is that the energies are in Kelvin (`K'), the unit most commonly found for parameters in Monte Carlo chemical simulation literature. This precludes the need to convert to kcal/mol, the energy unit used in \texttt{CHARMM}.\\The most frequently used section of the exotic files in the Mie potential section is \texttt{NONBONDED\_MIE}.\\Here are the parameters that are used to simulate alkanes:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{NONBONDED\_MIE}\\\texttt{!}\\\texttt{!V(mie) = 4*eps*((sig\_ij/r\_ij)\^n-(sig\_ij/r\_ij)\^6)}\\\texttt{!}\\\texttt{!atom   eps          sig        n    eps,1-4    sig,1-4     n,1-4 }\\\texttt{CH4     161.00       3.740      14   0.0 0.0 0.0 ! Potoff, et al. '09}\\\texttt{CH3     121.25       3.783      16   0.0 0.0 0.0 ! Potoff, et al. '09}\\\texttt{CH2      61.00       3.990      16   0.0 0.0 0.0 ! Potoff, et al. '09}\\
+\end{tabular}}\\\\
+\colorbox{yellow}{\texttt{NOTE:}} Although the units (Angstroms) are the same, the exotic file uses $\sigma$, not the $R_{min}$ used by \texttt{CHARMM}. The energy in the exotic file are expressed in Kelvin (K), as this is the standard convention in the literature.\\
+\subsection{Control File (*.conf)}
+The control file is GOMC's proprietary input file. It contains key settings. The settings generally fall under three categories:
+\begin{itemize}
+\item Input/Simulation Setup\item System Settings for During Run\item Output Settings
+\end{itemize}
+\colorbox{yellow}{\texttt{NOTE:}} The control file is designed to recognize logic values, such as ``yes/true/on" or ``no/false/off".\\
+\subsubsection{Input/Simulation Setup}In this section, input file names are listed. In addition, if you want to restart your simulation or use integer seed for running your simulation, you need to modify this section according to your purpose.
+\begin{description}
+\item [Restart] Determines whether to restart and, if so, what step to restart from.\\
+	\begin{itemize}
+	\item Value 1: $<BOOLEAN>$ - true if restart, false otherwise\\
+	\end{itemize}
+\item [FirstStep] Determines what step to restart from. If Restart was set to true, step number needs to be specified; otherwise, the program will terminate.\\
+	\begin{itemize}
+	\item Value 1: $<ULONG>$ - step to restart from\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# enable, step}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{Restart     true}\\	\texttt{FirstStep   1000000}\\
+	\end{tabular}}
+	\end{itemize}
+\item [PRNG] Dictates how to start the pseudo-random number generator (PRNG)
+	\begin{itemize}
+	\item Value 1: $<STRING>$
+		\begin{itemize}
+		\item \texttt{RANDOM}: Randomizes Mersenne Twister PRNG with random bits based on the system time.
+		\colorbox{lightgray}{
+		\begin{tabular}{l}
+		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\		\texttt{\# kind \{RESTART, RANDOM, INTSEED\}}\\		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\		\texttt{PRNG RANDOM}\\
+		\end{tabular}}
+		\item \texttt{INTSEED}: This option ``seeds" the Mersenne Twister PRNG with a standard integer. When the same integer is used, the generated PRNG stream should be the same every time, which is helpful in tracking down bugs.
+		\item \texttt{RESTART}: Used for restarting a previous simulation. This option in the Mersenne Twister's state from a saved file.\\
+		\colorbox{lightgray}{
+		\begin{tabular}{l}
+		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\		\texttt{\# kind \{RESTART, RANDOM, INTSEED\}}\\		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\		\texttt{PRNG RESTART}\\
+		\end{tabular}}
+		\end{itemize}
+	\end{itemize}
+\item [Random\_Seed] Defines the seed number. If ``INTSEED" is chosen, seed number needs to be specified; otherwise, the program will terminate.
+	\begin{itemize}
+	\item Value 1: $<ULONG>$ or $<UINT>$: If ``INTSEED" command is used (See above example).\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# kind \{RESTART, RANDOM, INTSEED\}}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{PRNG INTSEED}\\
+	\texttt{Random\_Seed 50}\\
+	\end{tabular}}
+	\end{itemize}
+\item [ParaTypeCHARMM] Sets force field type to \texttt{CHARMM} style.
+	\begin{itemize}
+	\item Value 1: $<BOOLEAN>$ - true if it is \texttt{CHARMM} force field, false if it is not.\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# FORCE FIELD TYPE}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{ParaTypeCHARMM true}\\
+	\end{tabular}}
+	\end{itemize}
+\item [ParaTypeEXOTIC] Sets force field type to \texttt{EXOTIC} style.	\begin{itemize}		\item Value 1: $<BOOLEAN>$ - true if it is \texttt{EXOTIC} force field, false if it is not.\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# FORCE FIELD TYPE}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{ParaTypeEXOTIC true}\\
+	\end{tabular}}
+	\end{itemize}
+\item [ParaTypeMARTINI] Sets force field type to MARTINI style.	\begin{itemize}		\item Value 1: $<BOOLEAN>$ - true if it is \texttt{MARTINI} force field, false if it is not.\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# FORCE FIELD TYPE}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{ParaTypeMARTINI true}\\
+	\end{tabular}}
+	\end{itemize}
+\item [Parameters] Provides the name and location of the parameter file to use for the simulation.	\begin{itemize}		\item Value 1: $<STRING>$ - Sets the name of the parameter file.\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# FORCE FIELD TYPE}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{ParaTypeCHARMM yes}\\	\texttt{Parameters ../../common/Par\_TraPPE\_Alkanes.inp}\\
+	\end{tabular}}
+	\end{itemize}
+\item [Coordinates] Defines the PDB filenames (coordinates) for each box in the system.
+	\begin{itemize}		\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0').\\
+	\item Value 2: $<STRING>$ - Sets PDB file name\\\\
+	\colorbox{yellow}{\texttt{NOTE:}} NVT and NPT ensembles requires only one PDB file and GEMC/GCMC requires two PDB files. If the number of PDB files is not compatible with the simulation type, the program will terminate. \\\\
+	Example of NVT or NPT ensemble\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# INPUT PDB FILES - NVT or NPT ensemble}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{Coordinates 0 STEP3\_START\_ISB\_sys.pdb}\\
+	\end{tabular}}\\\\
+	Example of Gibbs or GC ensemble\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# INPUT PDB FILES - Gibbs or GC ensemble}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{Coordinates 0 STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\	\texttt{Coordinates 1 STEP3\_START\_ISB\_sys\_BOX\_1.pdb}\\
+	\end{tabular}}
+	\end{itemize}
+\item [Structures] Defines the PSF filenames (structures) for each box in the system.
+	\begin{itemize}		\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0').\\
+	\item Value 2: $<STRING>$ - Sets PSF file name\\\\
+	\colorbox{yellow}{\texttt{NOTE:}} NVT and NPT ensembles requires only one PSF file and GEMC/GCMC requires two PSF files. If the number of PSF files is not compatible with the simulation type, the program will terminate. \\\\
+	Example of NVT or NPT ensemble\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# INPUT PSF FILES}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{Structure 0 STEP3\_START\_ISB\_sys.psf}\\
+	\end{tabular}}\\\\
+	Example of Gibbs or GC ensemble\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# INPUT PSF FILES}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{Structure 0 STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\	\texttt{Structure 1 STEP3\_START\_ISB\_sys\_BOX\_1.pdb}\\
+	\end{tabular}}
+	\end{itemize}
+\end{description}
+\subsubsection{System Settings for During Run Setup}
+This section contains all the variables not involved in the output of data during the simulation, or in the reading of input files at the start of the simulation.  In other words, it contains settings related to the moves, the thermodynamic constants (based on choice of ensemble), and the length of the simulation.\\Note that some tags, or entries for tags, are only used in certain ensembles (e.g. Gibbs ensemble). These cases are denoted with colored text.\\
+\begin{description}
+\item [GEMC] \colorbox{cyan}{(For Gibbs Ensemble runs only)} Defines what type of Gibbs Ensemble simulation you want to run.\\
+	If neglected in Gibbs Ensemble, it simply defaults to constant volume (NVT) Gibbs Ensemble.
+	\begin{itemize}
+	\item Value 1: $<STRING>$ - allows you to pick between isovolumetric (``NVT") and isobaric (``NPT") Gibbs ensemble simulations
+		\begin{itemize}
+		\item NVT: Run simulation with constant molecule number, volume, and temperature.\\
+		\colorbox{lightgray}{
+		\begin{tabular}{l}
+		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\		\texttt{\# GEMC TYPE (DEFAULT IS NVT\_GEMC}\\		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\		\texttt{GEMC    NVT}\\
+		\end{tabular}}
+		\item NPT: Run simulation with constant molecule number, pressure, and temperature.
+		\end{itemize}
+	\end{itemize}
+\item [Pressure] If ``NPT" simulation is chosen, imposed pressure (in bar) needs to be specified; otherwise, the program will terminate.
+	\begin{itemize}
+	\item Value 1: $<DOUBLE>$ - Constant pressure in bars.\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{\# GEMC TYPE (DEFAULT IS NVT\_GEMC}\\	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\	\texttt{GEMC    NPT}\\
+	\texttt{Pressure 5.76}\\
+	\end{tabular}}
+	\end{itemize}
+\item [Temperature] Sets the temperature at which the system will run.
+	\begin{itemize}
+	\item Value 1: $<DOUBLE>$ - The distance to truncate the Lennard-Jones potential at.
+	\end{itemize}
+\item [RcutLow] Sets a specific minimum possible in angstrom that reject any move that place any atom closer than specified distance.
+	\begin{itemize}
+	\item Value 1: $<DOUBLE>$ - The minimum possible distance between any atoms.
+	\end{itemize}
+\item [LRC] Defines whether or not long range corrections are used.
+	\begin{itemize}
+	\item Value 1: $<BOOLEAN>$ - True to consider long range correction. In case of using ``SHIFT" or ``SWITCH" potential functions, LRC will be ignored.
+	\end{itemize}
+\item [Exclude] Defines which pairs of bonded atoms should be excluded from non-bonded interactions.
+	\begin{itemize}
+	\item Value 1: $<STRING>$ - Allows you to choose between ``1-2", ``1-3", and ``1-4".
+		\begin{description}
+		\item [1-2] All interactions pairs of bonded atoms, except the ones that separated with one bond, will be considered and modified using 1-4 parameters defined in parameter file.
+		\item [1-3] All interaction pairs of bonded atoms, except the ones that separated with one or two bonds, will be considered and modified using 1-4 parameters defined in parameter file.		\item [1-4] All interaction pairs of bonded atoms, except the ones that separated with one, two or three bonds, will be considered using non-bonded parameters defined in parameter file.
+		\end{description}
+		\colorbox{yellow}{\texttt{NOTE:}} The default value is ``1-3".
+	\end{itemize}
+\item [Potential] 
+\end{description}
 
 
 
