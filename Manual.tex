@@ -232,14 +232,14 @@ To compile the GPU code on Linux, go to the directory of the project, and type i
 \texttt{\$ make}\\\\
 You can configure the ``makefile" file to choose different C compilers, to select the desired compute capability, and to configure many more compilation flags.\\
 The default compute capability is 3.0. To change the compute capability, go to the \texttt{GENCODE\_FLAGS} option, and set it to one of the compute capability flags that are defined in the file.
-\begin{minted}[frame=single,framesep=10pt]{make}
-# CUDA code generation flags
-GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
-GENCODE_SM10    := -gencode arch=compute_20,code=sm_20
-GENCODE_SM10    := -gencode arch=compute_30,code=sm_30
-GENCODE_SM10    := -gencode arch=compute_35,code=sm_35
-GENCODE_FLAGS   := $(GENCODE_SM30)
-\end{minted}
+%\begin{minted}[frame=single,framesep=10pt]{make}
+%CUDA code generation flags
+%GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
+%GENCODE_SM10    := -gencode arch=compute_20,code=sm_20
+%GENCODE_SM10    := -gencode arch=compute_30,code=sm_30
+%GENCODE_SM10    := -gencode arch=compute_35,code=sm_35
+%GENCODE_FLAGS   := $(GENCODE_SM30)
+%\end{minted}
 To run the program, run the executable ``GOMC.out".  The system's \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
 \subsubsection{Serial Code}
 \underline{Compilation on Windows}\\
@@ -644,10 +644,10 @@ Since isobutane has no dihedral, here are the parameters pertaining to 2,3-dimet
 \texttt{! Kchi (kcal/mol) = Kchi (K) * Boltz. const.}\\
 \texttt{!}\\
 \texttt{!atom types         Kchi        n    delta              description}\\
-\texttt{X   CH1 CH1 X      -0.498907    0      0.0              ! TraPPE 2}\\
-\texttt{X   CH1 CH1 X       0.851974    1      0.0              ! TraPPE 2}\\
-\texttt{X   CH1 CH1 X      -0.222269    2    180.0              ! TraPPE 2}\\
-\texttt{X   CH1 CH1 X       0.876894    3      0.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X      -0.498907    0       0.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X       0.851974    1       0.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X      -0.222269    2   180.0              ! TraPPE 2}\\
+\texttt{X   CH1 CH1 X       0.876894    3       0.0              ! TraPPE 2}\\
 \end{tabular}}\\\\
 \colorbox{yellow}{\texttt{NOTE:}} The code allows the use of `X' to indicate ambiguous positions on the ends. This is useful because this kind is often determined solely by the two middle atoms in the middle of the dihedral, according to literature.
 \subsubsection{IMPROPERS}
@@ -695,7 +695,7 @@ Here are the parameters that are used to simulate alkanes:\\\\
 \texttt{!atom   eps          sig        n    eps,1-4    sig,1-4     n,1-4 }\\
 \texttt{CH4     161.00       3.740      14   0.0 0.0 0.0 ! Potoff, et al. '09}\\
 \texttt{CH3     121.25       3.783      16   0.0 0.0 0.0 ! Potoff, et al. '09}\\
-\texttt{CH2      61.00       3.990      16   0.0 0.0 0.0 ! Potoff, et al. '09}\\
+\texttt{CH2       61.00       3.990      16   0.0 0.0 0.0 ! Potoff, et al. '09}\\
 \end{tabular}}\\\\
 \colorbox{yellow}{\texttt{NOTE:}} Although the units (Angstroms) are the same, the exotic file uses $\sigma$, not the $R_{min}$ used by \texttt{CHARMM}. The energy in the exotic file are expressed in Kelvin (K), as this is the standard convention in the literature.\\
 \subsection{Control File (*.conf)}
@@ -1037,7 +1037,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% of volumen swaps
 	\end{itemize}
-\item [IntraSwapFreq] (\colorbox{cyan}{For Gibbs and GC ensemble runs only}) Fractional percentage at which particle swap move will occur.
+\item [SwapFreq] (\colorbox{cyan}{For Gibbs and Grand Canonical (GC) ensemble runs only}) Fractional percentage at which particle swap move will occur.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% of molecule swaps
 	\end{itemize}
@@ -1115,28 +1115,28 @@ This section contains all the values that control output in the control file.  F
 \begin{description}
 \item [OutputName] Unique name for simulation used to name the block average, PDB, and PSF output files.
 	\begin{itemize}
-	\item Value 1: $<STRING>$ - Unique phhrase to identify this system
+	\item Value 1: $<STRING>$ - Unique phhrase to identify this system.\\\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{\#  OUTPUT FILE NAME}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{OutputName  ISB\_T\_270.00\_K}\\
+	\texttt{OutputName  ISB\_T\_270\_K}\\
 	\end{tabular}}
 	\end{itemize}
-\item [CoordinatesFreq] Controls output of PDB file (coordinates) and PRNG state. If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
+\item [CoordinatesFreq] Controls output of PDB file (coordinates). If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables dumping these files; ``false'' disables dumping.
 	\item Value 2: $<ULONG>$ - Steps per dump PDB frame. It should be less than or equal to RunSteps. If this keyword could not be found in configuration file, its value will be assigned a default value to dump 10 frames.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} The PDB file contains an entry for every ATOM, in all boxes read. This allows VMD (which requires a constant number of atoms) to properly parse frames, with a bit of help. Atoms that are not currently in a specific box are given the coordinate (0.00, 0.00, 0.00). The occupancy value corresponds to the box a molecule is currently in (e.g. 0.00 for box 0; 1.00 for box 1).\\\\
-	\colorbox{yellow}{\texttt{NOTE:}} At the beginning of simulation, a merged PSF file contains an entry for every ATOM, in which all boxes will be dumped. It also contains the topology for every molecule in both boxes, corresponding to the merged PDB format. Loading PDB files into merged PSF file in VMD allows the user to visualize and analyze the results.
+	\colorbox{yellow}{\texttt{NOTE:}} At the beginning of simulation, a merged PSF file contain  ``\_merged'' phrase, in which all boxes will be dumped. It also contains the topology for every molecule in both boxes, corresponding to the merged PDB format. Loading PDB files into merged PSF file in VMD allows the user to visualize and analyze the results.
 \item [RestartFreq] Controls the output of the last state of simulation at a specified step in PDB files (coordinates) that contain ``\_restart'' phrase. If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables dumping these files; ``false'' disables dumping.
-	\item Value 2: $<ULONG>$ - Steps per dump last state of simulation to PDB files. It should be less than or equal to \texttt{RunSteps}. If this keyword could not be found in the configuration file, \texttt{RunSteps} value will be assigned by default.
+	\item Value 2: $<ULONG>$ - Steps per dump last state of simulation to PDB files. It should be less than or equal to \texttt{RunSteps}. If this keyword could not be found in the configuration file, \texttt{RestartFreq} value will be assigned by default.
 	\end{itemize}
-	\colorbox{yellow}{\texttt{NOTE:}} The restart PDB file contains only \texttt{ATOM} that exist in each boxes at specified steps. This allows the user to use psfgen and tcl to build a new PSF file and reload it to \texttt{RESTART} the simulation.
+	\colorbox{yellow}{\texttt{NOTE:}} The restart PDB file contains only \texttt{ATOM} that exist in each boxes at specified steps. This allows the user to use psfgen and tcl to build a new PSF file and reload it to \texttt{RESTART} the simulation.\\
 	\colorbox{yellow}{\texttt{NOTE:}} \texttt{CoordinatesFreq} must be a common multiple of \texttt{RestartFreq} or vice versa.
 \item [ConsoleFreq] Controls the output to STDIO (``the console'') of messages such as acceptance statistics, and run timing info. In addition, instantaneously-selected thermodynamic properties will be output to this file.
 	\begin{itemize}
@@ -1162,10 +1162,10 @@ This section contains all the values that control output in the control file.  F
 	\texttt{RestartFreq  	  	 true   1000000}\\
 	\texttt{ConsoleFreq       	 true   100000}\\
 	\texttt{BlockAverageFreq  	 true   100000}\\
-	\texttt{HistogramFreq  		 true   10000}\\
+	\texttt{HistogramFreq  	 true   10000}\\
 	\end{tabular}}
 \end{description}
-The next section controls the output of the energy/particle sample file and the distribution file for particle counts, commonly referred to as the ``histogram'' output. This section is only required if GC ensemble simulation was used.
+The next section controls the output of the energy/particle sample file and the distribution file for particle counts, commonly referred to as the ``histogram'' output. This section is only required if Grand Canonical ensemble simulation was used.
 \begin{description}
 \item [DistName] Sets short phrase to naming particle distribution file.
 	\begin{itemize}
@@ -1207,20 +1207,21 @@ The next section controls the output of the energy/particle sample file and the 
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{\#  ENABLE: BLK AVF., FLUCK.}\\
+	\texttt{\#  ENABLE: BLK AVE., FLUC.}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{OutEnergy         true    true}\\
-	\texttt{OutPressure       true    true}\\
-	\texttt{OutMolNum         true    true}\\
-	\texttt{OutDensity        true    true}\\
-	\texttt{OutVolume         true    true}\\
-	\texttt{OutSurfaceTention         false    false}\\
+	\texttt{OutEnergy                      true    true}\\
+	\texttt{OutPressure                   true    true}\\
+	\texttt{OutMolNum                    true    true}\\
+	\texttt{OutDensity                     true    true}\\
+	\texttt{OutVolume                     true    true}\\
+	\texttt{OutSurfaceTention         false   false}\\
 	\end{tabular}}
 \end{description}
+\newpage
 \section{Sample Files}
 Here's a sample of how a typical \textcolor{orange}{NVT ensemble} control file might be expected to look:\\
 \texttt{\#==================================================}\\
-\texttt{\#=       GOMC beta 2.00 - NVT Control example     =}\\
+\texttt{\#=       GOMC - NVT Control example     }\\
 \texttt{\#==================================================}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1266,13 +1267,15 @@ Here's a sample of how a typical \textcolor{orange}{NVT ensemble} control file m
 \texttt{Rcut		10}\\
 \texttt{Exclude 	1-4}\\
 \texttt{}\\
+\newpage
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ELECTROSTATIC}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ElectroStatic		true}\\
+\texttt{ElectroStatic		        true}\\
 \texttt{Ewald				false}\\
-\texttt{Tolerance			0.0001}\\
+\texttt{Tolerance			0.00001}\\
 \texttt{1-4scaling			0.0}\\
+\texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# STEPS}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1284,14 +1287,13 @@ Here's a sample of how a typical \textcolor{orange}{NVT ensemble} control file m
 \texttt{\# MOVE FREQUENCY}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{DisFreq              		 0.80}\\
-\texttt{RotFreq		    	      0.10}\\
-\texttt{IntraSwapFreq		      0.10}\\
+\texttt{RotFreq		    	         0.10}\\
+\texttt{IntraSwapFreq		         0.10}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# PRESSURE CALCULATION}\\ 
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{PressureCalc	true 		10000}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# BOX DIMENSION \#, X, Y, Z}\\
@@ -1314,29 +1316,28 @@ Here's a sample of how a typical \textcolor{orange}{NVT ensemble} control file m
 \texttt{\# OUTPUT FILE NAME}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{OutputName  AR\_200\_00\_K\_2220\_r5}\\
-\texttt{}\\
+\newpage
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# STATISTICS	ENABLE,	FREQ.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CoordinatesFreq    true   1000000}\\
-\texttt{RestartFreq  	   true   1000000}\\
-\texttt{ConsoleFreq        true   1000000}\\
+\texttt{CoordinatesFreq      true   1000000}\\
+\texttt{RestartFreq  	         true   1000000}\\
+\texttt{ConsoleFreq            true   1000000}\\
 \texttt{BlockAverageFreq   true   1000000}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ENABLE: BLK AVF., FLUCK.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{OutEnergy         true    true}\\
-\texttt{OutPressure 	  true    true}\\
-\texttt{OutMolNum         false   false}\\ 
-\texttt{OutDensity        false   false}\\
+\texttt{OutPressure 	   true    true}\\
+\texttt{OutMolNum       false   false}\\ 
+\texttt{OutDensity         false   false}\\
 \texttt{}\\
-Here's a sample of how a typical Gibbs ensemble control file might be expected to look:\\
+\newpage
+Here's a sample of how a typical \textcolor{blue}{Gibbs ensemble} control file might be expected to look:\\
 \texttt{=============================================================}\\
-\texttt{=       GOMC beta 2.00 – Gibbs ensemble Control example     =}\\
+\texttt{=       GOMC - Gibbs ensemble Control example     }\\
 \texttt{=============================================================}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ENABLE, STEP}\\
@@ -1352,7 +1353,6 @@ Here's a sample of how a typical Gibbs ensemble control file might be expected t
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# FORCE FIELD}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ParaTypeCHARMM	 false}\\
 \texttt{ParaTypeEXOTIC	 true}\\
 \texttt{Parameters     	 Par\_MODEL\_NAME.inp}\\
 \texttt{}\\
@@ -1360,7 +1360,7 @@ Here's a sample of how a typical Gibbs ensemble control file might be expected t
 \texttt{\# INPUT PDB FILES}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{Coordinates 0    STEP3\_START\_XX\_PHA\_BOX\_0.pdb}\\
-\texttt{Coordinates 1	 STEP3\_START\_XX\_PHA\_BOX\_1.pdb}\\
+\texttt{Coordinates 1	   STEP3\_START\_XX\_PHA\_BOX\_1.pdb}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# INPUT PSF FILES}\\
@@ -1376,28 +1376,23 @@ Here's a sample of how a typical Gibbs ensemble control file might be expected t
 \texttt{\# GEMC TYPE (DEFULT IS NVT\_GEMC)}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{GEMC 		NPT}\\
-\texttt{Pressure   2.50}\\
-\texttt{}\\
+\texttt{Pressure         2.50}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# SIMULATION CONDITION}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{Temperature     200.00}\\
 \texttt{Potential 		SWITCH}\\
-\texttt{LRC			false}\\
+\texttt{LRC		false}\\
 \texttt{Rswitch		7}\\
-\texttt{Rcut			10}\\
+\texttt{Rcut		10}\\
 \texttt{RcutLow		1.0}\\
 \texttt{Exclude 		1-4}\\
-\texttt{}\\
-\texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ELECTROSTATIC}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Ewald				false}\\
+\texttt{Ewald			false}\\
 \texttt{ElectroStatic		false}\\
-\texttt{}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# STEPS}\\
@@ -1412,22 +1407,19 @@ Here's a sample of how a typical Gibbs ensemble control file might be expected t
 \texttt{DisFreq         	  0.69}\\
 \texttt{RotFreq		  0.10}\\
 \texttt{VolFreq		  0.01}\\
-\texttt{SwapFreq	       0.20}\\
+\texttt{SwapFreq	  0.20}\\
 \texttt{IntraSwapFreq	  0.00}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# PRESSURE CALCULATION}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{PressureCalc	true 		10000}\\
 \texttt{}\\
-\texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# BOX DIMENSION \#, X, Y, Z}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{BoxDim  0    35.00  35.00  35.00}\\
 \texttt{BoxDim  1    45.00  45.00  45.00}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# CBMC TRIALS}\\
@@ -1436,6 +1428,7 @@ Here's a sample of how a typical Gibbs ensemble control file might be expected t
 \texttt{CBMC\_Nth     4}\\
 \texttt{CBMC\_Ang     100}\\
 \texttt{CBMC\_Dih     30}\\
+\texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\#  =======-------------------- OUTPUT --------------------=========}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1444,26 +1437,26 @@ Here's a sample of how a typical Gibbs ensemble control file might be expected t
 \texttt{\# OUTPUT FILE NAME }\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{OutputName  AR\_200\_00\_K\_2220\_r5}\\
-\texttt{}\\
+\newpage
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# STATISTICS	ENABLE,	FREQ.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CoordinatesFreq    true   1000000}\\
-\texttt{RestartFreq  	   true   1000000}\\
-\texttt{ConsoleFreq        true   1000000}\\
+\texttt{CoordinatesFreq      true   1000000}\\
+\texttt{RestartFreq  	         true   1000000}\\
+\texttt{ConsoleFreq            true   1000000}\\
 \texttt{BlockAverageFreq   true   1000000}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ENABLE: BLK AVF., FLUCK.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{OutEnergy         true    true}\\
-\texttt{OutPressure       true    true}\\
-\texttt{OutMolNum         true    true}\\
+\texttt{OutPressure      true    true}\\
+\texttt{OutMolNum       true    true}\\
 \texttt{OutDensity        true    true}\\
-\texttt{}\\
-Here’s a sample of how a typical grand canonical ensemble control file might be expected to look:\\
+\newpage
+Here’s a sample of how a typical \textcolor{green}{grand canonical} ensemble control file might be expected to look:\\
 \texttt{=============================================================}\\
-\texttt{= GOMC beta 2.00 – Grand canonical ensemble Control example =}\\
+\texttt{= GOMC - Grand canonical ensemble Control example }\\
 \texttt{=============================================================}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ENABLE, STEP}\\
@@ -1478,15 +1471,15 @@ Here’s a sample of how a typical grand canonical ensemble control file might b
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# FORCE FIELD}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ParaTypeCHARMM	 false}\\
-\texttt{ParaTypeEXOTIC	 true}\\
-\texttt{Parameters     	 Par\_MODEL\_NAME.inp}\\
+\texttt{ParaTypeCHARMM	   false}\\
+\texttt{ParaTypeEXOTIC	   true}\\
+\texttt{Parameters        	   Par\_MODEL\_NAME.inp}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# INPUT PDB FILES}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{Coordinates 0    STEP3\_START\_XX\_PHA\_BOX\_0.pdb  }\\
-\texttt{Coordinates 1	 STEP3\_START\_XX\_PHA\_ Reserv\_BOX\_1.pdb}\\
+\texttt{Coordinates 1	   STEP3\_START\_XX\_PHA\_ Reserv\_BOX\_1.pdb}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# INPUT PSF FILES}\\
@@ -1503,21 +1496,18 @@ Here’s a sample of how a typical grand canonical ensemble control file might b
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{Temperature     200.00}\\
 \texttt{Potential 		VDW}\\
-\texttt{LRC			true}\\
-\texttt{Rcut			10}\\
+\texttt{LRC		true}\\
+\texttt{Rcut		10}\\
 \texttt{Exclude 		1-4}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ELECTROSTATIC}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Ewald				true}\\
+\texttt{Ewald			true}\\
 \texttt{ElectroStatic		true}\\
-\texttt{CachedFourier		true}\\
-\texttt{Tolerance			0.00001}\\
-\texttt{1-4scaling			0.0}\\
-\texttt{}\\
-\texttt{}\\
-\texttt{}\\
+\texttt{CachedFourier	true}\\
+\texttt{Tolerance		0.00001}\\
+\texttt{1-4scaling		0.0}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# STEPS }\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1530,13 +1520,12 @@ Here’s a sample of how a typical grand canonical ensemble control file might b
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{DisFreq         	  0.20}\\
 \texttt{RotFreq		  0.20}\\
-\texttt{SwapFreq	        0.60}\\
+\texttt{SwapFreq	  0.60}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# PRESSURE CALCULATION}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{PressureCalc	false}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# BOX DIMENSION \#, X, Y, Z}\\
@@ -1547,16 +1536,15 @@ Here’s a sample of how a typical grand canonical ensemble control file might b
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# CBMC TRIALS}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CBMC\_First   8}\\
-\texttt{CBMC\_Nth     4}\\
+\texttt{CBMC\_First        8}\\
+\texttt{CBMC\_Nth         4}\\
 \texttt{CBMC\_Ang     100}\\
-\texttt{CBMC\_Dih     30}\\
+\texttt{CBMC\_Dih        30}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\#          Mol. Name     Chem. Pot.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{ChemPot    DME             -2230}\\
-\texttt{}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\#  =======-------------------- OUTPUT --------------------=========}\\
@@ -1566,15 +1554,15 @@ Here’s a sample of how a typical grand canonical ensemble control file might b
 \texttt{\# OUTPUT FILE NAME }\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{OutputName  DME\_200\_00\_K\_2220}\\
-\texttt{}\\
+\newpage
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# STATISTICS	ENABLE,	FREQ.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CoordinatesFreq    true   1000000}\\
-\texttt{RestartFreq	   true   1000000}\\
-\texttt{ConsoleFreq        true   1000000}\\
+\texttt{CoordinatesFreq      true   1000000}\\
+\texttt{RestartFreq	         true   1000000}\\
+\texttt{ConsoleFreq            true   1000000}\\
 \texttt{BlockAverageFreq   true   1000000}\\
-\texttt{HistogramFreq      true   100000}\\
+\texttt{HistogramFreq         true   100000}\\
 \texttt{}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# OutHistSettings}\\
@@ -1588,11 +1576,12 @@ Here’s a sample of how a typical grand canonical ensemble control file might b
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 \texttt{\# ENABLE: BLK AVF., FLUCK.}\\
 \texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutEnergy         true    	true}\\
-\texttt{OutPressure       false   	false}\\
-\texttt{OutMolNum         true    	true}\\
-\texttt{OutDensity        false   	false}\\
-\texttt{OutSurfaceTension false	false}\\
+\texttt{OutEnergy                 true    	true}\\
+\texttt{OutPressure              false   	false}\\
+\texttt{OutMolNum               true    	true}\\
+\texttt{OutDensity                false   	false}\\
+\texttt{OutSurfaceTension   false	false}\\
+\newpage
 \section{GOMC's Output Files, Terminal Output}
 GOMC currently supports several kinds of output:
 \begin{itemize}
@@ -1611,11 +1600,11 @@ GOMC output units:\\
 Properties & Units & Properties & Units \\
 \hline
 Energy & $K$ & Volume & $\mathring{A}^3$ \\
-Pressure, Pressure Tensor & bar & Density & $Kg/m^3$ \\
+Pressure, Pressure Tensor & bar & Density & $kg/m^3$ \\
 Heat of vaporization & KJ/mol & Surface Tension & mN/m \\
 \end{tabular}}
 \subsection{Console Output}
-A variety of useful information relating to instantaneous statistical and thermodynamic data (move trials, acceptance rates, file I/O messages warnings, and other kinds of information) is printed to the \texttt{STDIO}, which, in Linux, will typically be displayed in the terminal.  This output can be redirected into a log file in Linux using the `$>$' operator.\\\\
+A variety of useful information relating to instantaneous statistical and thermodynamic data (move trials, acceptance rates, file I/O messages warnings, and other kinds of information) is printed to the \texttt{STDIO}, which, in Linux, will typically be displayed in the terminal.  This output can be redirected into a log file in Linux using the '' $>$ '' operator.\\\\
 Statistical and thermodynamic information is provided in console output.\\
 \begin{itemize}
 \item Energy
@@ -1639,9 +1628,11 @@ Statistical and thermodynamic information is provided in console output.\\
 \item Mole fraction of each species
 \end{itemize}
 Detailed move, energy, and statistical or thermodynamic information for each simulation box will be printed in three different sections. Each section’s title will start with \texttt{MTITLE}, \texttt{ETITLE}, and \texttt{STITLE} for move, energy, and statistical information, respectively. The instantaneous values for each section will start with \texttt{MOVE\_\#}, \texttt{ENER\_\#}, and \texttt{STAT\_\#} for move, energy, and statistical values, respectively. Where, \texttt{\#} is the simulation box number.  In addition, if pressure calculation is activated and enabled to print, pressure tensor will be printed in the console output file.  This section starts with \texttt{PRES\_\#} and print the diagonal value of pressure tensor $P_{xx}, P_{yy}, and P_{zz}$, respectively.  The second element after the title of each section is the step number.
+\newline
+\newline
 In order to extract the desired information from the console file, ``grep'' and ``awk'' commands can be used with a proper title section. For example, in order to extract total energy of the system, the following command needs to be executed in terminal:\\\\
 \colorbox{lightgray}{
-\texttt{grep ``ENER\_0''   output\_console.log | awk `{print \$3}'}
+\texttt{grep ``ENER\_0''   output\_console.log | awk '\{{print \$3}\}'}
 }\\\\
 Here, ``output\_console.log'' is the console output file and ``\$3'' represents the second element of the ``ENERGY\_BOX\_0'' section.
 The first section of this console output typically includes some info relating to the system, CPU, and RAM. In continue, console output includes information regarding the input file (configuration file) reading, force field reading, summary of the topology of the molecule, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)
@@ -1651,6 +1642,7 @@ The first section of this console output typically includes some info relating t
 \begin{figure}[H]
 \includegraphics[scale=1]{images/out2}
 \end{figure}
+\newpage
 Next, the energy title and initial energy of the system's starting configuration will print:\\
 \begin{figure}[H]
 \includegraphics[scale=1]{images/out3}
@@ -1673,7 +1665,7 @@ For Gibbs ensemble, the same PSF will be used to visualize either box, i.e.\\
 \colorbox{lightgray}{
 \texttt{vmd ISB\_T\_330.00\_K\_Run\_0\_MIE\_BOX\_0.pdb ISB\_T\_330.00\_K\_Run\_0\_MIE\_merged.pdb}
 }\\\\
-...for visualizing the first box and...\\
+... for visualizing the first box and...\\
 \colorbox{lightgray}{
 \texttt{vmd ISB\_T\_330.00\_K\_Run\_0\_MIE\_BOX\_1.pdb ISB\_T\_330.00\_K\_Run\_0\_MIE\_merged.pdb}
 }\\\\
@@ -1702,7 +1694,7 @@ GOMC tracks a number of thermodynamic variables of interest during the simulatio
 \end{itemize}
 At the beginning of each file, the title of each property followed by their average values is printed. Desired data can be extracted, as explained before, using the ``awk'' command. For example, in order to extract total density of the system, the following command need to be executed in terminal:\\\\
 \colorbox{lightgray}{
-\texttt{cat Blk\_OUTPUTNAME\_BOX\_0.dat | awk `{print \$13}'}
+\texttt{cat Blk\_OUTPUTNAME\_BOX\_0.dat | awk `\{{print \$13}\}'}
 }\\\\
 Here, ``Blk\_OUTPUTNAME\_BOX\_0.dat'' is the block-average file for simulation box 0 and ``\$13'' represents the 13th column of the block file.
 \section{Putting it all together: Running a GOMC Simulation}
@@ -1738,6 +1730,7 @@ Next, six files need to be made:
 \texttt{ATOM      4 C4   ISB     1       1.424   0.413  -1.257		C}\\
 \texttt{END}\\
 \end{tabular}}\\\\
+\newline
 \textbf{Top\_Branched\_Alkane.inp}\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -1756,6 +1749,7 @@ Next, six files need to be made:
 \texttt{PATCHING FIRS NONE LAST NONE}\\
 \texttt{END}\\
 \end{tabular}}\\\\
+\newline
 \textbf{pack\_box\_0.inp}\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -1768,6 +1762,7 @@ Next, six files need to be made:
 \texttt{inside box 0. 0. 0. 68.00 68.00 68.00}\\
 \texttt{end structure}\\
 \end{tabular}}\\\\
+\newline
 \textbf{pack\_box\_1.inp}\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -1780,6 +1775,7 @@ Next, six files need to be made:
 \texttt{inside box 0. 0. 0. 68.00 68.00 68.00}\\
 \texttt{end structure}\\
 \end{tabular}}\\\\
+\newline
 \textbf{build\_box\_0.inp}\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -1794,6 +1790,7 @@ Next, six files need to be made:
 \texttt{writepsf ./STEP3\_START\_ISB\_sys\_BOX\_0.psf}\\
 \texttt{writepdb ./STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\
 \end{tabular}}\\\\
+\newline
 \textbf{build\_box\_1.inp}\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -1845,7 +1842,7 @@ Here, 4 defines the number of processors that will be used to run the simulation
 Progress can be monitored in the terminal with the tail command:\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
-\texttt{tail –f out\_ISB*log}
+\texttt{tail $-$f out\_ISB.log}
 \end{tabular}}\\\\
 \textcolor{green}{\texttt{Congratulations!}} You have examined a single-phase coexistence point on the saturated vapor-liquid curve using GOMC operating in the Gibbs ensemble.
 \begin{figure}[H]
