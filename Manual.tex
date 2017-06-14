@@ -698,6 +698,7 @@ Here are the parameters that are used to simulate alkanes:\\\\
 \texttt{CH2       61.00       3.990      16   0.0 0.0 0.0 ! Potoff, et al. '09}\\
 \end{tabular}}\\\\
 \colorbox{yellow}{\texttt{NOTE:}} Although the units (Angstroms) are the same, the exotic file uses $\sigma$, not the $R_{min}$ used by \texttt{CHARMM}. The energy in the exotic file are expressed in Kelvin (K), as this is the standard convention in the literature.\\
+\newpage
 \subsection{Control File (*.conf)}
 The control file is GOMC's proprietary input file. It contains key settings. The settings generally fall under three categories:
 \begin{itemize}
@@ -984,7 +985,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{ElectroStatic 		true}\\
 	\texttt{Ewald		   		true}\\
-	\texttt{Tolerance	        	0.0001}\\
+	\texttt{Tolerance	        	0.00001}\\
 	\texttt{1-4scaling			0.0}\\
 	\end{tabular}}
 \item [RunSteps] Sets the total number of steps to run (one move is performed for each step) (cycles = this value / number of molecules in the system)
@@ -1816,8 +1817,8 @@ This will create the intermediate PDBs.\\\\
 Then, run the PSFGen scripts to finish the system using the following commands:\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
-\texttt{VMD < ./build\_box\_0.inp}\\
-\texttt{VMD < ./build\_box\_1.inp}\\
+\texttt{vmd < ./build\_box\_0.inp}\\
+\texttt{vmd < ./build\_box\_1.inp}\\
 \end{tabular}}\\\\
 This will create the intermediate PDBs.\\
 To run the code a few additional things will be needed:
@@ -1850,17 +1851,87 @@ Progress can be monitored in the terminal with the tail command:\\
 \includegraphics[scale=0.5]{images/isobutane_result}
 \caption{Repeating this process for multiple temperatures will allow you to obtain the following results.}
 \end{figure}
+\newpage
+\section{Intermolecular Energy and Virial function}
+In this section, the virial and energy equation for different potential function are discussed in details.
+\subsection{VDW} This option calculates potential energy without any truncation.
+
+\begin{itemize}
+	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential, a Mie potential in which the attractive exponent is fixed. The Mie potential can be viewed as a generalized version of the 12-6 Lennard-Jones potential, \\
+\begin{equation}
+E_{ij} = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]
+\end{equation}
+
+where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.
+\begin{equation}
+C_{n_{ij}} = \bigg(\frac{n_{ij}}{n_{ij} - 6} \bigg)\bigg(\frac{n_{ij}}{6} \bigg)^{6/(n_{ij} - 6)}
+\end{equation}
+
+	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance.\\
+\begin{equation}
+W_{ij} = -\frac{dE_{ij}}{dr}\times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
+\end{equation}Using n$-$6 LJ potential defined above:
+\begin{equation}
+W_{ij} = 6\times C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
+\end{equation}
+\colorbox{yellow}{\texttt{NOTE:}} This option only evaluates the energy up to specified \texttt{Rcut} distance. Tail correction to energy and pressure can be specified to account for infinite cutoff distance.
+\end{itemize}
 
 
+\subsection{SHIFT} This option forces the potential energy to be zero at \texttt{Rcut} distance.
+\begin{itemize}
+	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential,
+	\begin{equation}
+E_{ij}(\texttt{shift}) = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg] - C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_cut}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_cut}\bigg)^6\bigg]
+\end{equation}
 
+where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 2, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.
+	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 3.\\Using \texttt{SHIFT} potential function defined above:
+\begin{equation}
+W_{ij}(\texttt{shift}) = 6\times C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
+\end{equation}
+\end{itemize}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=1.0]{images/VDW_SHIFT}
+\caption{Graph of Van der Waals potential with and without the application of the \texttt{SHIFT} function. With the \texttt{SHIFT} function active, the potential by force was reduced to 0.0 at the \texttt{Rcut} distance. With the \texttt{SHIFT} function, there is a discontinuity where the potential is truncated.}
+\end{figure}
 
-
-
-
-
-
-
-
+\subsection{SWITCH} This option in \texttt{CHARMM} or \texttt{EXOTIC} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{Rswitch} distance.
+\begin{itemize}
+	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential,
+	\begin{equation}
+E_{ij}(\texttt{switch}) = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times F_E
+	\end{equation}
+	where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 2, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.\\\\
+	The factor $F_E$ is defined as:
+\[
+	F_E = 
+	\begin{cases}
+		1 & r_{ij} \leq r_{switch} \\
+		\frac{\big({r_{cut}}^2 - {r_{ij}}^2 \big)^2 \times \big({r_{cut}}^2 - 3{r_{switch}}^2 + 2{r_{ij}}^2 \big)}{\big({r_{cut}}^2 - {r_{switch}}^2 \big)^3} & r_{switch} < r_{ij} < r_{cut} \\
+		0 & r_{ij} \leq r_{cut}
+	\end{cases}
+\]
+\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 3.\\Using \texttt{SWITCH} potential function defined above:
+\begin{equation}
+W_{ij}(\texttt{switch}) = 6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times F_E \times  \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2} - C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg] \times F_W
+\end{equation}
+	The factor $F_W$ is defined as:
+	\[
+	F_W = 
+	\begin{cases}
+		1 & r_{ij} \leq r_{switch} \\
+		\frac{12\big({r_{cut}}^2 - {r_{ij}}^2 \big) \times \big({r_{switch}}^2 - {r_{ij}}^2 \big)}{\big({r_{cut}}^2 - {r_{switch}}^2 \big)^3} & r_{switch} < r_{ij} < r_{cut} \\
+		0 & r_{ij} \leq r_{cut}
+	\end{cases}
+\]
+\end{itemize}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=1.0]{images/SWITCH}
+\caption{Graph of Van der Waals potential with and without the application of the \texttt{SWITCH }function. With the \texttt{SWITCH} function active, the potential is smoothly reduced to 0.0 at the \texttt{Rcut distance}. }
+\end{figure}
 
 
 
