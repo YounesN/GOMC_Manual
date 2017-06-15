@@ -21,6 +21,7 @@
 \documentclass[a4paper]{article}
 \usepackage[letterpaper, margin=1in]{geometry}
 \usepackage{amsmath}
+\usepackage{pgfmath}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{titling}
@@ -32,6 +33,9 @@
 \usepackage{minted}
 \usepackage{tabularx}
 \usepackage{amsmath}
+
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\erfc}{erfc}
 
 \DeclareUnicodeCharacter{FFFD}{~~~~~~~~~}
 
@@ -1636,7 +1640,12 @@ In order to extract the desired information from the console file, ``grep'' and 
 \texttt{grep ``ENER\_0''   output\_console.log | awk '\{{print \$3}\}'}
 }\\\\
 Here, ``output\_console.log'' is the console output file and ``\$3'' represents the second element of the ``ENERGY\_BOX\_0'' section.
-The first section of this console output typically includes some info relating to the system, CPU, and RAM. In continue, console output includes information regarding the input file (configuration file) reading, force field reading, summary of the topology of the molecule, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)
+The first section of this console output typically includes some info relating to the system, CPU, and RAM. In continue, console output includes information regarding the input file (configuration file) reading, force field reading, summary of the topology of the molecule, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)\\\\
+\textit{\colorbox{yellow}{NOTE}: Surface Tension is calculated using Virial method according to following equation,}
+\begin{equation}
+	\gamma = \frac{1}{2A_{xy}} \int_{0}^{L} \bigg(P_{zz} - \frac{P_{xx} + P_{yy}}{2} \bigg) dz
+\end{equation}
+
 \begin{figure}[H]
 \includegraphics[scale=1]{images/out1}
 \end{figure}
@@ -1852,8 +1861,8 @@ Progress can be monitored in the terminal with the tail command:\\
 \caption{Repeating this process for multiple temperatures will allow you to obtain the following results.}
 \end{figure}
 \newpage
-\section{Intermolecular Energy and Virial function}
-In this section, the virial and energy equation for different potential function are discussed in details.
+\section{Intermolecular Energy and Virial function (Van der Waals)}
+In this section, the virial and energy equation of Van der Waals interaction for different potential function are discussed in details.
 \subsection{VDW} This option calculates potential energy without any truncation.
 
 \begin{itemize}
@@ -1869,26 +1878,28 @@ C_{n_{ij}} = \bigg(\frac{n_{ij}}{n_{ij} - 6} \bigg)\bigg(\frac{n_{ij}}{6} \bigg)
 
 	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance.\\
 \begin{equation}
-W_{ij} = -\frac{dE_{ij}}{dr}\times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
-\end{equation}Using n$-$6 LJ potential defined above:
+W_{ij} = -\frac{dE_{ij}}{dr}\times \frac{\rightharpoonup{r_{ij}}}{r_{ij}}
+\end{equation}
+Using n$-$6 LJ potential defined above:
 \begin{equation}
-W_{ij} = 6\times C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
+W_{ij} = 6C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{6} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
 \end{equation}
 \colorbox{yellow}{\texttt{NOTE:}} This option only evaluates the energy up to specified \texttt{Rcut} distance. Tail correction to energy and pressure can be specified to account for infinite cutoff distance.
 \end{itemize}
 
-
+%SHIFT
 \subsection{SHIFT} This option forces the potential energy to be zero at \texttt{Rcut} distance.
 \begin{itemize}
 	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential,
 	\begin{equation}
-E_{ij}(\texttt{shift}) = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg] - C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_cut}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_cut}\bigg)^6\bigg]
+E_{ij}(\texttt{shift}) = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg] - C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{cut}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{cut}}\bigg)^6\bigg]
 \end{equation}
 
-where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 2, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.
-	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 3.\\Using \texttt{SHIFT} potential function defined above:
+where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 3, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.
+	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4.\\
+Using \texttt{SHIFT} potential function defined above:
 \begin{equation}
-W_{ij}(\texttt{shift}) = 6\times C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
+W_{ij}(\texttt{shift}) = 6C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{6} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
 \end{equation}
 \end{itemize}
 \begin{figure}[H]
@@ -1897,25 +1908,27 @@ W_{ij}(\texttt{shift}) = 6\times C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2}
 \caption{Graph of Van der Waals potential with and without the application of the \texttt{SHIFT} function. With the \texttt{SHIFT} function active, the potential by force was reduced to 0.0 at the \texttt{Rcut} distance. With the \texttt{SHIFT} function, there is a discontinuity where the potential is truncated.}
 \end{figure}
 
+%SWITCH 
 \subsection{SWITCH} This option in \texttt{CHARMM} or \texttt{EXOTIC} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{Rswitch} distance.
 \begin{itemize}
 	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential,
 	\begin{equation}
 E_{ij}(\texttt{switch}) = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times F_E
 	\end{equation}
-	where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 2, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.\\\\
+	where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 3, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.\\\\
 	The factor $F_E$ is defined as:
 \[
 	F_E = 
 	\begin{cases}
 		1 & r_{ij} \leq r_{switch} \\
 		\frac{\big({r_{cut}}^2 - {r_{ij}}^2 \big)^2 \times \big({r_{cut}}^2 - 3{r_{switch}}^2 + 2{r_{ij}}^2 \big)}{\big({r_{cut}}^2 - {r_{switch}}^2 \big)^3} & r_{switch} < r_{ij} < r_{cut} \\
-		0 & r_{ij} \leq r_{cut}
+		0 & r_{ij} \geq r_{cut}
 	\end{cases}
 \]
-\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 3.\\Using \texttt{SWITCH} potential function defined above:
+\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4.\\
+Using \texttt{SWITCH} potential function defined above:
 \begin{equation}
-W_{ij}(\texttt{switch}) = 6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times F_E \times  \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2} - C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg] \times F_W
+W_{ij}(\texttt{switch}) = \Bigg[6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{6} \times \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg]\times \frac{F_E}{{r_{ij}}^2}  - C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^{n_{ij}} - \bigg(\frac{\sigma_{ij}}{r_{ij}}\bigg)^6\bigg] \times F_W \Bigg] \times \overrightarrow{r_{ij}}
 \end{equation}
 	The factor $F_W$ is defined as:
 	\[
@@ -1923,15 +1936,123 @@ W_{ij}(\texttt{switch}) = 6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{2} \tim
 	\begin{cases}
 		1 & r_{ij} \leq r_{switch} \\
 		\frac{12\big({r_{cut}}^2 - {r_{ij}}^2 \big) \times \big({r_{switch}}^2 - {r_{ij}}^2 \big)}{\big({r_{cut}}^2 - {r_{switch}}^2 \big)^3} & r_{switch} < r_{ij} < r_{cut} \\
-		0 & r_{ij} \leq r_{cut}
+		0 & r_{ij} \geq r_{cut}
 	\end{cases}
 \]
 \end{itemize}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/SWITCH}
-\caption{Graph of Van der Waals potential with and without the application of the \texttt{SWITCH }function. With the \texttt{SWITCH} function active, the potential is smoothly reduced to 0.0 at the \texttt{Rcut distance}. }
+\caption{Graph of Van der Waals potential with and without the application of the \texttt{SWITCH }function. With the \texttt{SWITCH} function active, the potential is smoothly reduced to 0.0 at the \texttt{Rcut} distance. }
 \end{figure}
+
+%SWITCH MARTINI
+\subsection{SWITCH} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{Rswitch} distance.
+\begin{itemize}
+	\item Interactions between atoms can be modeled with an n$-$6 potential. In standard \texttt{MARTINI}, $n$ is equal to 12,
+	\begin{equation}
+	E_{ij}(\texttt{switch}) = C_{n_{ij}}\epsilon_{ij} \Bigg[ {\sigma_{ij}}^{n} \bigg(\frac{1}{{r_{ij}}^{n}} + \varphi_{n} (r_{ij}) \bigg) - {\sigma_{ij}}^{6} \bigg(\frac{1}{{r_{ij}}^{6}} + \varphi_{6} (r_{ij}) \bigg) \Bigg]
+	\end{equation}
+where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 3, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.\\\\
+The factor $\varphi_{\alpha}$ and constants are defined as:
+
+\[
+	\varphi_{\alpha}(r_{ij}) = 
+	\begin{cases}
+		-C_{\alpha} & r_{ij} \leq r_{switch} \\
+		-\frac{A_{\alpha}}{3} (r_{ij} - r_{switch})^3 -\frac{B_{\alpha}}{4} (r_{ij} - r_{switch})^4 - C_{\alpha} & r_{switch} < r_{ij} < r_{cut} \\
+		0 & r_{ij} \geq r_{cut}
+	\end{cases}
+\]
+
+\begin{equation}
+	A_{\alpha} = \alpha \frac{(\alpha + 1) r_{switch} - (\alpha +4) r_{cut}} {{r_{cut}}^{(\alpha + 2)} {(r_{cut} - r_{switch})}^2}
+\end{equation}
+\begin{equation}
+	B_{\alpha} = \alpha \frac{(\alpha + 1) r_{switch} - (\alpha +3) r_{cut}} {{r_{cut}}^{(\alpha + 2)} {(r_{cut} - r_{switch})}^3}
+\end{equation}
+\begin{equation}
+	C_{\alpha} =  \frac{1}{{r_{cut}}^{\alpha}} -\frac{A_{\alpha}}{3} (r_{cut} - r_{switch})^3 -\frac{B_{\alpha}}{4} (r_{cut} - r_{switch})^4
+\end{equation}
+
+\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4.\\
+Using the \texttt{SWITCH} potential function defined for \texttt{MARTINI} force field:
+
+	\begin{equation}
+	W_{ij}(\texttt{switch}) = C_{n_{ij}}\epsilon_{ij} \Bigg[ {\sigma_{ij}}^{n} \bigg(\frac{n}{{r_{ij}}^{(n+1)}} + d\varphi_{n} (r_{ij}) \bigg) - {\sigma_{ij}}^{6} \bigg(\frac{6}{{r_{ij}}^{(6+1)}} +d \varphi_{6} (r_{ij}) \bigg) \Bigg]\times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
+	\end{equation}
+The constants defined in Eq. 11-13 and the factor $d\varphi_{\alpha}$ defined as:
+\[
+	d\varphi_{\alpha}(r_{ij}) = 
+	\begin{cases}
+		0 & r_{ij} \leq r_{switch} \\
+		A_{\alpha} (r_{ij} - r_{switch})^2 + B_{\alpha} (r_{ij} - r_{switch})^3 & r_{switch} < r_{ij} < r_{cut} \\
+		0 & r_{ij} \geq r_{cut}
+	\end{cases}
+\]
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=1.0]{images/MARTINI}
+\caption{Graph of Van der Waals potential with and without the application of the \texttt{SWITCH} function in \texttt{MARTINI} force field. With the \texttt{SWITCH} function active, the potential is smoothly reduced to 0.0 at the \texttt{Rcut} distance.  }
+\end{figure}	
+\newpage
+
+%Electrostatic
+\section{Intermolecular Energy and Virial function (Electrostatic)}
+In this section, the virial and energy equation of electrostatic interaction for different potential function are discussed in details.
+
+\subsection{Ewald} This option calculate electrostatic energy using standard \texttt{Ewald Summation Method}. Once this option is activated, it would override the the electrostatic calculation using \texttt{VDW, SHIDT, and SWITCH} functions.
+
+\begin{itemize}
+	\item Potential Calculation: Coulomb interactions between atoms can be modeled as,
+	\begin{equation}
+		E(\texttt{Ewald}) = E_{real} + E_{reciprocal} + E_{self} + E_{correction}
+	\end{equation}	
+	$E_{real}$: Defines the short range electrostatic energy according to,
+	\begin{equation}
+		E_{real} = \frac{1}{4\pi \epsilon_0} \frac{1}{2} \sum_{i =1}^{N} \sum_{j = 1}^{N} q_i q_j  \frac{\erfc(\alpha r_{ij})}{r_{ij}}
+	\end{equation}
+	, where $\alpha$ is \texttt{Ewald} separation parameter,
+	\begin{equation}
+		\alpha = \frac {\sqrt{-\log (Tolerance)}}{r_{cut}}
+	\end{equation}
+	, where $Tolerance$ is a parameter, controlling the desired accuracy.\\
+
+	$E_{reciprocal}$: Defines the long range electrostatic energy according to,
+	\begin{equation}
+		E_{reciprocal} = \frac{1}{\epsilon_0 V} \frac {1}{2} \sum_{\overrightarrow{k} \ne 0}^{} \frac {1}{\overrightarrow{k}^2}\exp(\frac {-\overrightarrow{k}^2}{4 \alpha^2}) \Bigg[ {\bigg| \sum_{i=1}^{N} q_i \cos (\overrightarrow{k_i}.\overrightarrow{x_i}) \bigg|}^2 + {\bigg| \sum_{i=1}^{N} q_i \sin (\overrightarrow{k_i}.\overrightarrow{x_i}) \bigg|}^2 \Bigg]
+	\end{equation}
+	, where $\overrightarrow{k}$ is reciprocal vector.\\
+	
+	$E_{self}$: Defines the self energy according to,	
+	\begin{equation}
+	E_{self} = -\frac{\alpha}{4\pi \epsilon_0 \sqrt{\pi}} \sum_{i=1}^{N} {q_i}^2
+	\end{equation}
+	
+	$E_{correction}$: Defines intra-molecule nonbonded enegy,	
+	\begin{equation}
+	E_{correction} = -\frac{1}{4\pi \epsilon_0} \frac{1}{2} \sum_{j=1}^{N }\sum_{l =1}^{N_j} \sum_{m = 1}^{N_j} q_{j_l} q_{j_m}  \frac{\erf(\alpha r_{j_l j_m})}{r_{j_l j_m}}
+	\end{equation}
+
+\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4. Coulomb force between atoms can be modeled as,\\
+
+	\begin{equation}
+		W(\texttt{Ewald}) = W_{real} + W_{reciprocal} 
+	\end{equation}
+	
+	$W_{real}$: Defines the short range electrostatic force according to,
+	\begin{equation}
+		W_{real} = \frac{1}{4\pi \epsilon_0} \frac{1}{2} \sum_{i =1}^{N} \sum_{j = 1}^{N} q_i q_j  \bigg[ \frac{1 - \erf(\alpha r_{ij})}{r_{ij}} + \frac{2\alpha}{ \sqrt{\pi}} \exp(-\alpha^2 {r_{ij}}^2) \bigg] \times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
+	\end{equation}
+	
+	$W_{reciprocal}$: Defines the long range electrostatic force according to,
+	\begin{equation}
+		W_{real} = \frac{1}{4\pi \epsilon_0} \frac{1}{2} \sum_{i =1}^{N} \sum_{j = 1}^{N} q_i q_j  \bigg[ \frac{1 - \erf(\alpha r_{ij})}{r_{ij}} + \frac{2\alpha}{ \sqrt{\pi}} \exp(-\alpha^2 {r_{ij}}^2) \bigg] \times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2}
+	\end{equation}
+
+\end{itemize}
 
 
 
