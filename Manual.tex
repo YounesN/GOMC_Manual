@@ -43,7 +43,7 @@
 \pretitle{%
   \begin{center}
   \LARGE
-  \includegraphics[width=6cm,height=6cm]{images/logo}\\[\bigskipamount]
+  \includegraphics[width=10cm,height=10cm]{images/logo}\\[\bigskipamount]
 }
 \posttitle{\end{center}}
 \setlength{\parindent}{0cm}
@@ -51,7 +51,7 @@
 \begin{document}
 
 \title{\Huge User Manual\\Version 2.00}
-\author{\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\Distributed by the Potoff and Schwiebert Groups\\\textcopyright Wayne State University}
+\author{\\\\\\\\\\\\\\\\\\\\\\\\\\Distributed by the Potoff and Schwiebert Groups\\\textcopyright Wayne State University}
 
 \maketitle
 \thispagestyle{empty}
@@ -1925,6 +1925,9 @@ E_{ij}(\texttt{switch}) = C_{n_{ij}} \epsilon_{ij} \bigg[\bigg(\frac{\sigma_{ij}
 		0 & r_{ij} \geq r_{cut}
 	\end{cases}
 \]
+\begin{equation}
+\end{equation}
+	
 \item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4.\\
 Using \texttt{SWITCH} potential function defined above:
 \begin{equation}
@@ -1939,6 +1942,8 @@ W_{ij}(\texttt{switch}) = \Bigg[6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{6
 		0 & r_{ij} \geq r_{cut}
 	\end{cases}
 \]
+\begin{equation}
+\end{equation}
 \end{itemize}
 \begin{figure}[H]
 \centering
@@ -1949,11 +1954,12 @@ W_{ij}(\texttt{switch}) = \Bigg[6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{6
 %SWITCH MARTINI
 \subsection{SWITCH} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{Rswitch} distance.
 \begin{itemize}
-	\item Interactions between atoms can be modeled with an n$-$6 potential. In standard \texttt{MARTINI}, $n$ is equal to 12,
+	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential. In standard \texttt{MARTINI}, $n$ is equal to 12,
 	\begin{equation}
 	E_{ij}(\texttt{switch}) = C_{n_{ij}}\epsilon_{ij} \Bigg[ {\sigma_{ij}}^{n} \bigg(\frac{1}{{r_{ij}}^{n}} + \varphi_{n} (r_{ij}) \bigg) - {\sigma_{ij}}^{6} \bigg(\frac{1}{{r_{ij}}^{6}} + \varphi_{6} (r_{ij}) \bigg) \Bigg]
 	\end{equation}
-where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 3, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.\\\\
+where $r_{ij}$, $\epsilon_{ij}$, and $\sigma_{ij}$ are, respectively, the separation, well depth, and collision diameter for the pair of interaction sites $i$ and $j$. The constant $C_n$ is a normalization factor according to Eq. 3, such that the minimum of the potential remains at $-\epsilon_{ij}$ for all $n_{ij}$. In the 12-6 potential, $C_n$ reduces to the familiar value of 4.
+\newpage
 The factor $\varphi_{\alpha}$ and constants are defined as:
 
 \[
@@ -1964,7 +1970,8 @@ The factor $\varphi_{\alpha}$ and constants are defined as:
 		0 & r_{ij} \geq r_{cut}
 	\end{cases}
 \]
-
+\begin{equation}
+\end{equation}
 \begin{equation}
 	A_{\alpha} = \alpha \frac{(\alpha + 1) r_{switch} - (\alpha +4) r_{cut}} {{r_{cut}}^{(\alpha + 2)} {(r_{cut} - r_{switch})}^2}
 \end{equation}
@@ -1990,6 +1997,8 @@ The constants defined in Eq. 11-13 and the factor $d\varphi_{\alpha}$ defined as
 		0 & r_{ij} \geq r_{cut}
 	\end{cases}
 \]
+\begin{equation}
+\end{equation}
 \end{itemize}
 
 \begin{figure}[H]
@@ -2064,6 +2073,7 @@ In this section, the virial and energy equation of electrostatic interaction for
 	, where $\overrightarrow{r_{ic}}$ is the vector between atom and the center of the mass of the molecule.
 \end{itemize}
 
+%SHIFT
 \subsection{SHIFT} This option forces the electrostatic energy to be zero at \texttt{Rcut} distance.
 \begin{itemize}
 \item Potential Calculation: Coulomb interactions between atoms can be modeled as
@@ -2072,8 +2082,53 @@ In this section, the virial and energy equation of electrostatic interaction for
 	\end{equation}	
 \item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4. Coulomb force between atoms can be modeled as,\\
 	\begin{equation}
-		E(\texttt{SHIFT}) = \frac{q_i q_j}{4\pi \epsilon_0} \Big( \frac{1}{r_{ij}} \times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2} \Big)
+		W(\texttt{SHIFT}) = \frac{q_i q_j}{4\pi \epsilon_0} \Big( \frac{1}{r_{ij}} \times \frac{\overrightarrow{r_{ij}}}{{r_{ij}}^2} \Big)
 	\end{equation}	
 \end{itemize}
+
+%SWITCH
+\subsection{SWITCH} This option in \texttt{CHARMM} or \texttt{EXOTIC} force field forces the electrostatic energy to be zero at \texttt{Rcut} distance.
+\begin{itemize}
+	\item Potential Calculation: Coulomb interactions between atoms can be modeled as,
+	\begin{equation}
+		E(\texttt{SWITCH}) = \frac{q_i q_j}{4\pi \epsilon_0} \bigg( \Big(\frac{r_{ij}}{r_{cut}} \Big)^2 - 1.0\bigg)^2 \frac{1}{r_{ij}}
+	\end{equation}
+	
+	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4. Coulomb force between atoms can be modeled as,\\
+	\begin{equation}
+		W(\texttt{SWITCH}) = \frac{q_i q_j}{4\pi \epsilon_0} \Bigg[ \bigg( \Big(\frac{r_{ij}}{r_{cut}} \Big)^2 - 1.0\bigg)^2 \frac{1}{{r_{ij}}^2} - \bigg( \frac{4}{{r_{cut}}^2} \bigg) \bigg( \Big(\frac{r_{ij}}{r_{cut}} \Big)^2 - 1.0\bigg) \Bigg] \times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
+	\end{equation}	
+\end{itemize}
+
+%MARTINI
+\subsection{SWITCH} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{"Rswitch = 0.0"} distance.
+\begin{itemize}
+	\item Potential Calculation: Coulomb interactions between atoms can be modeled as,
+	\begin{equation}
+		E(\texttt{SWITCH}) = \frac{q_i q_j}{4\pi \epsilon_0 \epsilon_1} \bigg( \frac{1}{r_{ij}} + \varphi_{1} (r_{ij}) \bigg)
+	\end{equation}
+	, where $\epsilon_1$ is the dielectric constant, which in \texttt{MARTINI} force field is equal to 15.0 and $\varphi_{\alpha} (r_{ij})$ is defined in Eq. 13-16.
+	
+	\item Virial Calculation: Virial is basically the negative derivative of energy with respect to distance, multiplied by distance, Eq. 4. Coulomb force between atoms can be modeled as,\\
+	\begin{equation}
+		W(\texttt{SWITCH}) =  \frac{q_i q_j}{4\pi \epsilon_0 \epsilon_1} \bigg( \frac{1}{{r_{ij}}^2} + d\varphi_1 (r_{ij})  \bigg) \times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
+	\end{equation}
+	, where $\varphi_1 (r_{ij})$ is defined in Eq. 18.	
+\end{itemize}
+\newpage
+
+%Contact
+\section{Get Help or Technical Support }
+
+For get any help or technical support, please send message to \texttt{GOMC gitter}:\\\\
+\url{https://gitter.im/GOMC_WSU/Lobby} \\\\
+or send email to:\\
+\begin{itemize}
+
+	\item Jeffrey Potoff:  \texttt{jpotoff@wayne.edu}
+	\item Loren Schwiebert: \texttt{loren@wayne.edu}
+	
+\end{itemize}
+
 
 \end{document}
