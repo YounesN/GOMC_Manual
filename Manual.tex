@@ -69,8 +69,18 @@ The Transferable Potentials for Phase Equilibria (TraPPE) united atom (UA) force
 \section{Introduction}
 Monte Carlo (MC) simulation is a type of simulation driven by stochastic processes.  "GO" stands for GPU-Optimized; this code was intended to run optimally on modern graphics process hardware.\\\\
 More specifically, this engine includes serial and GPU-Optimized (multi-threaded) codes designed to run Markov chain Boltzmann sampling of chemical systems -- effectively sets of points defined by topological maps and interaction algorithms in a simulation box.  From statistical mechanics, we know this is one way to sample phase space and model chemical systems.\\\\
-GOMC currently supports canonical, isobaric-isothermal, Grand canonical, constant volume Gibbs ensemble, and constant pressure Gibbs ensemble simulations.  GOMC employs widely-used simulation file types (PDB, CHARMM-style parameter file, PSF).  GOMC includes configurational bias algorithms for both linear and branched charged, and none charged systems. 
+GOMC currently is capable of simulating systems in the following ensembles: 
+\begin{itemize}
+	\item Canonical (NVT)
+	\item Isobaric-isothermal (NPT)
+	\item Grand canonical ($\mu$ VT) 
+	\item Constant volume Gibbs (NVT-Gibbs) 
+	\item Constant pressure Gibbs (NPT-Gibbs). \\
+\end{itemize}
 
+GOMC employs widely-used simulation file types (PDB, PSF, CHARMM-style parameter file).  GOMC includes configurational bias algorithms for both linear and branched charged, and none charged systems. 
+
+\newpage
 \section{How to get the software}
 The latest public code builds, project logo, manual, and other resources can be obtained via the following website:\\\\
 \url{http://gomc.eng.wayne.edu/}
