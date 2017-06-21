@@ -68,7 +68,7 @@ The Transferable Potentials for Phase Equilibria (TraPPE) united atom (UA) force
 
 \section{Introduction}
 Monte Carlo (MC) simulation is a type of simulation driven by stochastic processes.  "GO" stands for GPU-Optimized; this code was intended to run optimally on modern graphics process hardware.\\\\
-More specifically, this engine includes serial and GPU-Optimized (multi-threaded) codes designed to run Markov chain Boltzmann sampling of chemical systems -- effectively sets of points defined by topological maps and interaction algorithms in a simulation box.  From statistical mechanics, we know this is one way to sample phase space and model chemical systems.\\\\
+More specifically, this engine includes CPU and GPU-Optimized (multi-threaded) codes designed to run Markov chain Boltzmann sampling of chemical systems -- effectively sets of points defined by topological maps and interaction algorithms in a simulation box.  From statistical mechanics, we know this is one way to sample phase space and model chemical systems.\\\\
 GOMC currently is capable of simulating systems in the following ensembles: 
 \begin{itemize}
 	\item Canonical (NVT)
@@ -123,7 +123,7 @@ GOMC has some mild software requirements, which are widely available for Linux o
 Type the following command in a terminal: \\\\
 \texttt{\$ icpc --version} \\\\
 If gives a version number 4.4 or later, you're all set.  If it's older than 4.4 (released in 2009), we recommend upgrading. \\
-In Linux, the Intel compiler will generally produce the fastest serial executables (when running on Intel Core processors). \\\\
+In Linux, the Intel compiler will generally produce the fastest CPU executables (when running on Intel Core processors). \\\\
 ��� g++ (GNU GCC) \\
 Type the following command in a terminal.\\\\
 \texttt{\$ g++ --version}\\\\
@@ -155,7 +155,7 @@ To check if nvcc is installed:\\\\
 \texttt{\$ which nvcc}\\\\
 To check the version number:\\\\
 \texttt{\$ nvcc --version}\\\\
-CUDA is viewed as an essential requirement, but is not used to compile the serial code, which can be compiled on systems without CUDA.\\
+CUDA is viewed as an essential requirement, but is not used to compile the CPU code, which can be compiled on systems without CUDA.\\
 To download CUDA visit NVIDIA's webpage:\\\\
 \url{https://developer.nvidia.com/cuda-downloads}
 \begin{figure}[H]
@@ -235,7 +235,7 @@ Below is an example of what the downloaded code looks like when unzipping in Pea
 \centering
 \includegraphics[scale=0.6]{images/peazip}
 \end{figure}
-In Linux, the GPU and Serial codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
+In Linux, the GPU and CPU codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
 \texttt{\$ tar -xzvf <file name>.tar.gz}
 \subsection{Compiling the code}
 \subsubsection{GPU code}
@@ -258,18 +258,18 @@ The default compute capability is 3.0. To change the compute capability, go to t
 To run the program, run the executable ``GOMC.out".  The system's \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
 \subsubsection{CPU Code}
 \underline{Compilation on Windows}\\
-See GPU ``Compilation on Windows" section and follow an identical procedure for the released serial code. See \texttt{README} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
+See GPU ``Compilation on Windows" section and follow an identical procedure for the released CPU code. See \texttt{README} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
 \underline{Compilation on Linux}\\
 In Linux, the CPU code uses a simple makefile. Enter the directory and type in the command line:\\\\
 \texttt{\$ make all}\\\\
 This will use the Makefile to compile a GPU-compatible executable called ``GOMC.out".  To run, the system?s \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
-For the serial code, which uses cmake for compilation, go to the base directory and type in the command line:\\\\
+For the CPU code, which uses cmake for compilation, go to the base directory and type in the command line:\\\\
 \texttt{\$ ./metamake.sh}\\\\
 This cmake script will create a directory named ``bin".  Enter this directory:\\\\
 \texttt{\$ cd bin}\\\\
 and type:\\\\
 \texttt{\$ make}\\\\
-Four executables - \texttt{GOMC\_Serial\_GEMC} (Gibbs ensemble), \texttt{GOMC\_Serial\_NVT} (NVT ensemble), \texttt{GOMC\_Serial\_NPT} (isobaric-isothermal ensemble), and \texttt{GOMC\_Serial\_GCMC} (Grand canonical ensemble) - will be produced. By default, the distribution compiles in release mode.  To compile in debug mode (if you're using the code as a developer), open the file ``\texttt{CMakeCache.txt}" while still in the ``bin" folder.  This file contains information used by cmake to build the executables.  To compile in debug mode, change the value after ``\texttt{CMAKE\_BUILD\_TYPE:STRING=}" from ``Release" to ``Debug", and retype the command:\\\\ \texttt{\$ make}\\\\
+Four executables - \texttt{GOMC\_CPU\_GEMC} (Gibbs ensemble), \texttt{GOMC\_CPU\_NVT} (NVT ensemble), \texttt{GOMC\_CPU\_NPT} (isobaric-isothermal ensemble), and \texttt{GOMC\_CPU\_GCMC} (Grand canonical ensemble) - will be produced. By default, the distribution compiles in release mode.  To compile in debug mode (if you're using the code as a developer), open the file ``\texttt{CMakeCache.txt}" while still in the ``bin" folder.  This file contains information used by cmake to build the executables.  To compile in debug mode, change the value after ``\texttt{CMAKE\_BUILD\_TYPE:STRING=}" from ``Release" to ``Debug", and retype the command:\\\\ \texttt{\$ make}\\\\
 The output executables should now be compiled with debugger symbols.
 You can also swap the compiler by modifying the ``\texttt{CMAKE\_CXX\_COMPILER}" variable. For more information, refer to the CMake documentation.\\
 Running GOMC in parallel using OpenMP:\\
@@ -1377,7 +1377,7 @@ The general plan for running the simulation is:
 \item Run the simulation in the terminal.
 \item Analyze the output.
 \end{enumerate}
-Please, complete steps 1 and 2; then, traverse to the directory, which should now contain a single file ``GOMC\_Serial\_GEMC''.
+Please, complete steps 1 and 2; then, traverse to the directory, which should now contain a single file ``GOMC\_CPU\_GEMC''.
 Next, six files need to be made:
 \begin{itemize}
 \item PDB file for isobutane
