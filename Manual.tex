@@ -238,32 +238,54 @@ Below is an example of what the downloaded code looks like when unzipping in Pea
 In Linux, the GPU and CPU codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
 \texttt{\$ tar -xzvf <file name>.tar.gz}
 \subsection{Compiling the code}
+subsubsection{Configure CMAKE}
+GOMC use CMAKE to generate multi-platform intermediate files to compile the project. In this section, you can find all the information needed to configure CMAKE.\\
+We recommend using a different directory for the cmake output than the home directory of the project as cmake tend to generate lots of files.\\
+CMake has a ridiculously expansive set of options, so this document will only reproduce the most obviously relevant ones. When possible, options should be passed into CMake via command line options rather than the CMakeCached.txt file:
+\begin{description}
+\item [CMAKE\_BUILD\_TYPE] To get the best performance you should build the project in release mode. In cmake GUI you can set the value of ``CMAKE\_BUILD\_TYPE'' to ``Release'' and in cmake command line you can add the following to the cmake:\\\\
+\texttt{-DCMAKE\_BUILD\_TYPE=Release}\\\\
+Other options are ``$<$ None $\mid$ Debug $\mid$ ReleaseWithDebInfo $\mid$ MinSizeRel $>$''.
+\item [CMAKE\_CXX\_COMPILER] This option will set the compiler. It is recommended to use the Intel Compiler and linking tools, if possible (icc/icpc/etc.). They significantly outperform the default GNU and Visual Studio compiler tools and are available for free for academic use with registration.
+\item [ENSEMBLE\_NVT] You can turn the compilation of CPU version of NVT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_NVT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_NPT] You can turn the compilation of CPU version of NPT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_NPT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GCMC] You can turn the compilation of CPU version of GCMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GCMC=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GEMC] You can turn the compilation of CPU version of GEMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GEMC=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_NVT] You can turn the compilation of GPU version of NVT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_NVT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_NPT] You can turn the compilation of GPU version of NPT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_NPT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_GCMC] You can turn the compilation of GPU version of GCMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_GCMC=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_GEMC] You can turn the compilation of GPU version of GEMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_GEMC=$<$On $\mid$ Off $>$}
+\end{description}
 \subsubsection{GPU code}
 \underline{Compilation on Windows}\\
-Once the code is extracted, to compile it on Windows, you need to load the project into Visual Studio by opening the extracted folder and double clicking on the solution file of the desired Visual Studio version.  After the solution is opened in Visual Studio, go to the ``Build" menu and select ``Build solution" to compile the code. You can compile either with release mode or with debug mode by selecting the desired mode from the ``Solution Configuration" drop box. 
-To run the project, simply click the run button or hit F5 on the keyboard.\\\\
+To compile the GPU code, CUDA is required and can be downloaded from:\\\\
+\url{https://developer.nvidia.com/cuda-downloads}.\\\\
+Once you have the executable you can follow the instruction guide provided by NVIDIA and install the CUDA:\\\\
+\url{http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html}\\\\
+Be sure to check the requirements mentioned as in most cases you won't be able to run CUDA on latest version of Visual Studio (Visual Studio 2017 is not supported at the time of writing this guide).\\
+To generate the Visual Studio project files you can run ``cmake''. You could use either the cmake GUI or the cmake command line to generate the project. If you are using cmake GUI make sure you select the correct compiler verion (e.g Visual Studio 2015 compiler is version 14.0). Finally, you can simply open the project and build the executables with Visual Studio. \\\\
 \underline{Compilation on Linux}\\
-To compile the GPU code on Linux, go to the directory of the project, and type in the command line:\\\\
+Same as Windows compilation, CUDA toolkit is required to compile GPU code on Linux. If you do not have CUDA, cmake will only generate CPU code.\\
+To compile GOMC on Linux give permission to ``metamake.sh" and run it.\\\\
+\texttt{\$ chmod u+x metamake.sh}\\
+\texttt{\$ ./metamake.sh}\\\\
+This script will create a directory and run cmake for you. Once it's complete, you can go to ``bin" directory type make to start compiling the code:\\\\
 \texttt{\$ make}\\\\
-You can configure the ``makefile" file to choose different C compilers, to select the desired compute capability, and to configure many more compilation flags.\\
-The default compute capability is 3.0. To change the compute capability, go to the \texttt{GENCODE\_FLAGS} option, and set it to one of the compute capability flags that are defined in the file.
-%\begin{minted}[frame=single,framesep=10pt]{make}
-%CUDA code generation flags
-%GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
-%GENCODE_SM10    := -gencode arch=compute_20,code=sm_20
-%GENCODE_SM10    := -gencode arch=compute_30,code=sm_30
-%GENCODE_SM10    := -gencode arch=compute_35,code=sm_35
-%GENCODE_FLAGS   := $(GENCODE_SM30)
-%\end{minted}
-To run the program, run the executable ``GOMC.out".  The system's \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
+It should generate all the executables in the ``bin" directory.
+
 \subsubsection{CPU Code}
 \underline{Compilation on Windows}\\
-See GPU ``Compilation on Windows" section and follow an identical procedure for the released CPU code. See \texttt{README} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
+See GPU ``Compilation on Windows" section and follow an identical procedure for the released CPU code (Except you don't need CUDA if you only need CPU executables). See \texttt{README.md} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
 \underline{Compilation on Linux}\\
-In Linux, the CPU code uses a simple makefile. Enter the directory and type in the command line:\\\\
-\texttt{\$ make all}\\\\
-This will use the Makefile to compile a GPU-compatible executable called ``GOMC.out".  To run, the system?s \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
-For the CPU code, which uses cmake for compilation, go to the base directory and type in the command line:\\\\
+For the serial code, which uses cmake for compilation, go to the base directory and type in the command line:\\\\
 \texttt{\$ ./metamake.sh}\\\\
 This cmake script will create a directory named ``bin".  Enter this directory:\\\\
 \texttt{\$ cd bin}\\\\
@@ -275,7 +297,8 @@ You can also swap the compiler by modifying the ``\texttt{CMAKE\_CXX\_COMPILER}"
 Running GOMC in parallel using OpenMP:\\
 To run the parallel version of CPU code, it needs to be compiled with openmp library. Open the file ``\texttt{CMakeCache.txt}", while still in the ``bin" folder, and change the value after ``\texttt{CMAKE\_CXX\_FLAGS\_RELEASE:STRING=}" from ``-O3 -DNDEBUG" to ``-O3 -qopenmp -DNDEBUG".\\
 And retype the command:\\\\
-\texttt{\$ make}
+\texttt{\$ make}\\\\
+
 \newpage
 
 %INPUT FILE
