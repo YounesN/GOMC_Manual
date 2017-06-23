@@ -544,6 +544,7 @@ Here's a full parameter file prepared to pack a system of isobutane:\\\\
 \texttt{!}\\
 \texttt{MASS   1  CH3  15.035 C !}\\
 \texttt{MASS   2  CH1  13.019 C !}\\\\
+\texttt{AUTOGENERATE ANGLES DIHEDRALS}\\\\
 \texttt{RESI ISB ~~ 0.00 ! isobutane - TraPPE}\\
 \texttt{GROUP}\\
 \texttt{ATOM C1 CH1    0.00 !    C3}\\
@@ -1123,7 +1124,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\texttt{\#  BOX DIMENSION \#, X, Y, Z}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{BoxDim 0 106.00 106.00 106.00}\\
-	\texttt{BoxDim 0 176.00 176.00 176.00}\\
+	\texttt{BoxDim 1 176.00 176.00 176.00}\\
 	\end{tabular}}
 \item [CBMC\_First] Number of CBMC trials to choose the first seed position (Lennard-Jones trials for first seed growth)
 	\begin{itemize}
