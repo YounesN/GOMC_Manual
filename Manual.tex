@@ -43,7 +43,7 @@
 \pretitle{%
   \begin{center}
   \LARGE
-  \includegraphics[width=10cm,height=10cm]{images/logo}\\[\bigskipamount]
+  \includegraphics[width=4.54in,height=4in]{images/logo}\\[\bigskipamount]
 }
 \posttitle{\end{center}}
 \setlength{\parindent}{0cm}
@@ -68,9 +68,19 @@ The Transferable Potentials for Phase Equilibria (TraPPE) united atom (UA) force
 
 \section{Introduction}
 Monte Carlo (MC) simulation is a type of simulation driven by stochastic processes.  "GO" stands for GPU-Optimized; this code was intended to run optimally on modern graphics process hardware.\\\\
-More specifically, this engine includes serial and GPU-Optimized (multi-threaded) codes designed to run Markov chain Boltzmann sampling of chemical systems -- effectively sets of points defined by topological maps and interaction algorithms in a simulation box.  From statistical mechanics, we know this is one way to sample phase space and model chemical systems.\\\\
-GOMC currently supports canonical, isobaric-isothermal, Grand canonical, constant volume Gibbs ensemble, and constant pressure Gibbs ensemble simulations.  GOMC employs widely-used simulation file types (PDB, CHARMM-style parameter file, PSF).  GOMC includes configurational bias algorithms for both linear and branched charged, and none charged systems. 
+More specifically, this engine includes CPU and GPU-Optimized (multi-threaded) codes designed to run Markov chain Boltzmann sampling of chemical systems -- effectively sets of points defined by topological maps and interaction algorithms in a simulation box.  From statistical mechanics, we know this is one way to sample phase space and model chemical systems.\\\\
+GOMC currently is capable of simulating systems in the following ensembles: 
+\begin{itemize}
+	\item Canonical (NVT)
+	\item Isobaric-isothermal (NPT)
+	\item Grand canonical ($\mu$ VT) 
+	\item Constant volume Gibbs (NVT-Gibbs) 
+	\item Constant pressure Gibbs (NPT-Gibbs). \\
+\end{itemize}
 
+GOMC employs widely-used simulation file types (PDB, PSF, CHARMM-style parameter file).  GOMC includes configurational bias algorithms for both linear and branched charged, and none charged systems. 
+
+\newpage
 \section{How to get the software}
 The latest public code builds, project logo, manual, and other resources can be obtained via the following website:\\\\
 \url{http://gomc.eng.wayne.edu/}
@@ -103,17 +113,17 @@ The CPU and GPU code are merged together under GOMC repository and can be found 
 
 GOMC officially supports Windows 7, 8, and most modern distributions of Linux (see the next section).  This software has the ability to compile on recent versions of OS X; however, such a platform is not officially supported. 
 
-\subsection{Required Software Prequisites}
+\subsection{Required Software Requisites}
 
 GOMC has some mild software requirements, which are widely available for Linux operating systems.  Required software requirements are:\\\\
 \begin{easylist}[articletoc]
 � C++03 Compliant Compiler
 �� Linux/OS X
-��� icc (Intel C++ Compiler)\\
+� icpc (Intel C++ Compiler)\\\\
 Type the following command in a terminal: \\\\
-\texttt{\$ icc --version} \\\\
+\texttt{\$ icpc --version} \\\\
 If gives a version number 4.4 or later, you're all set.  If it's older than 4.4 (released in 2009), we recommend upgrading. \\
-In Linux, the Intel compiler will generally produce the fastest serial executables (when running on Intel Core processors). \\\\
+In Linux, the Intel compiler will generally produce the fastest CPU executables (when running on Intel Core processors). \\\\
 ��� g++ (GNU GCC) \\
 Type the following command in a terminal.\\\\
 \texttt{\$ g++ --version}\\\\
@@ -145,7 +155,7 @@ To check if nvcc is installed:\\\\
 \texttt{\$ which nvcc}\\\\
 To check the version number:\\\\
 \texttt{\$ nvcc --version}\\\\
-CUDA is viewed as an essential requirement, but is not used to compile the serial code, which can be compiled on systems without CUDA.\\
+CUDA is viewed as an essential requirement, but is not used to compile the CPU code, which can be compiled on systems without CUDA.\\
 To download CUDA visit NVIDIA's webpage:\\\\
 \url{https://developer.nvidia.com/cuda-downloads}
 \begin{figure}[H]
@@ -213,7 +223,8 @@ Cygwin is one option to assist in building and visualizing systems in Windows. I
 \includegraphics[scale=0.6]{images/cygwin}
 \end{figure}
 The software is a free and open source, licensed under the GNU General Public License version 3. Its primary maintainers are Red Hat Inc. and NetApp. One of the most impressive abilities of Cygwin is its ability to launch a full Windows-compatible X-server Window, which allows convenient visualization of Linux app GUIs. It is compatible with the Grace graphing software. In practice, this package behaves most analogously to a Linux virtual machine in Windows.
-
+\newpage
+%COMLILING
 \section{Compiling GOMC}
 \subsection{Extracting the code}
 GOMC is distributed as a compressed folder, containing the source and build system. To compile the code after downloading it, the first step is to extract the compressed build folder.\\
@@ -224,47 +235,73 @@ Below is an example of what the downloaded code looks like when unzipping in Pea
 \centering
 \includegraphics[scale=0.6]{images/peazip}
 \end{figure}
-In Linux, the GPU and Serial codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
+In Linux, the GPU and CPU codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
 \texttt{\$ tar -xzvf <file name>.tar.gz}
 \subsection{Compiling the code}
+subsubsection{Configure CMAKE}
+GOMC use CMAKE to generate multi-platform intermediate files to compile the project. In this section, you can find all the information needed to configure CMAKE.\\
+We recommend using a different directory for the cmake output than the home directory of the project as cmake tend to generate lots of files.\\
+CMake has a ridiculously expansive set of options, so this document will only reproduce the most obviously relevant ones. When possible, options should be passed into CMake via command line options rather than the CMakeCached.txt file:
+\begin{description}
+\item [CMAKE\_BUILD\_TYPE] To get the best performance you should build the project in release mode. In cmake GUI you can set the value of ``CMAKE\_BUILD\_TYPE'' to ``Release'' and in cmake command line you can add the following to the cmake:\\\\
+\texttt{-DCMAKE\_BUILD\_TYPE=Release}\\\\
+Other options are ``$<$ None $\mid$ Debug $\mid$ ReleaseWithDebInfo $\mid$ MinSizeRel $>$''.
+\item [CMAKE\_CXX\_COMPILER] This option will set the compiler. It is recommended to use the Intel Compiler and linking tools, if possible (icc/icpc/etc.). They significantly outperform the default GNU and Visual Studio compiler tools and are available for free for academic use with registration.
+\item [ENSEMBLE\_NVT] You can turn the compilation of CPU version of NVT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_NVT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_NPT] You can turn the compilation of CPU version of NPT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_NPT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GCMC] You can turn the compilation of CPU version of GCMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GCMC=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GEMC] You can turn the compilation of CPU version of GEMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GEMC=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_NVT] You can turn the compilation of GPU version of NVT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_NVT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_NPT] You can turn the compilation of GPU version of NPT ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_NPT=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_GCMC] You can turn the compilation of GPU version of GCMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_GCMC=$<$On $\mid$ Off $>$}
+\item [ENSEMBLE\_GPU\_GEMC] You can turn the compilation of GPU version of GEMC ensemble on or off using this option.\\
+\texttt{-DENSEMBLE\_GPU\_GEMC=$<$On $\mid$ Off $>$}
+\end{description}
 \subsubsection{GPU code}
 \underline{Compilation on Windows}\\
-Once the code is extracted, to compile it on Windows, you need to load the project into Visual Studio by opening the extracted folder and double clicking on the solution file of the desired Visual Studio version.  After the solution is opened in Visual Studio, go to the ``Build" menu and select ``Build solution" to compile the code. You can compile either with release mode or with debug mode by selecting the desired mode from the ``Solution Configuration" drop box. 
-To run the project, simply click the run button or hit F5 on the keyboard.\\\\
+To compile the GPU code, CUDA is required and can be downloaded from:\\\\
+\url{https://developer.nvidia.com/cuda-downloads}.\\\\
+Once you have the executable you can follow the instruction guide provided by NVIDIA and install the CUDA:\\\\
+\url{http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html}\\\\
+Be sure to check the requirements mentioned as in most cases you won't be able to run CUDA on latest version of Visual Studio (Visual Studio 2017 is not supported at the time of writing this guide).\\
+To generate the Visual Studio project files you can run ``cmake''. You could use either the cmake GUI or the cmake command line to generate the project. If you are using cmake GUI make sure you select the correct compiler verion (e.g Visual Studio 2015 compiler is version 14.0). Finally, you can simply open the project and build the executables with Visual Studio. \\\\
 \underline{Compilation on Linux}\\
-To compile the GPU code on Linux, go to the directory of the project, and type in the command line:\\\\
+Same as Windows compilation, CUDA toolkit is required to compile GPU code on Linux. If you do not have CUDA, cmake will only generate CPU code.\\
+To compile GOMC on Linux give permission to ``metamake.sh" and run it.\\\\
+\texttt{\$ chmod u+x metamake.sh}\\
+\texttt{\$ ./metamake.sh}\\\\
+This script will create a directory and run cmake for you. Once it's complete, you can go to ``bin" directory type make to start compiling the code:\\\\
 \texttt{\$ make}\\\\
-You can configure the ``makefile" file to choose different C compilers, to select the desired compute capability, and to configure many more compilation flags.\\
-The default compute capability is 3.0. To change the compute capability, go to the \texttt{GENCODE\_FLAGS} option, and set it to one of the compute capability flags that are defined in the file.
-%\begin{minted}[frame=single,framesep=10pt]{make}
-%CUDA code generation flags
-%GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
-%GENCODE_SM10    := -gencode arch=compute_20,code=sm_20
-%GENCODE_SM10    := -gencode arch=compute_30,code=sm_30
-%GENCODE_SM10    := -gencode arch=compute_35,code=sm_35
-%GENCODE_FLAGS   := $(GENCODE_SM30)
-%\end{minted}
-To run the program, run the executable ``GOMC.out".  The system's \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
-\subsubsection{Serial Code}
+It should generate all the executables in the ``bin" directory.
+
+\subsubsection{CPU Code}
 \underline{Compilation on Windows}\\
-See GPU ``Compilation on Windows" section and follow an identical procedure for the released serial code. See \texttt{README} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
+See GPU ``Compilation on Windows" section and follow an identical procedure for the released CPU code (Except you don't need CUDA if you only need CPU executables). See \texttt{README.md} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
 \underline{Compilation on Linux}\\
-In Linux, the CPU code uses a simple makefile. Enter the directory and type in the command line:\\\\
-\texttt{\$ make all}\\\\
-This will use the Makefile to compile a GPU-compatible executable called ``GOMC.out".  To run, the system?s \texttt{LD\_LIBRARY\_PATH} will need to be configured to support CUDA (more on this later).
 For the serial code, which uses cmake for compilation, go to the base directory and type in the command line:\\\\
 \texttt{\$ ./metamake.sh}\\\\
 This cmake script will create a directory named ``bin".  Enter this directory:\\\\
 \texttt{\$ cd bin}\\\\
 and type:\\\\
 \texttt{\$ make}\\\\
-Four executables - \texttt{GOMC\_Serial\_GEMC} (Gibbs ensemble), \texttt{GOMC\_Serial\_NVT} (NVT ensemble), \texttt{GOMC\_Serial\_NPT} (isobaric-isothermal ensemble), and \texttt{GOMC\_Serial\_GCMC} (Grand canonical ensemble) - will be produced. By default, the distribution compiles in release mode.  To compile in debug mode (if you're using the code as a developer), open the file ``\texttt{CMakeCache.txt}" while still in the ``bin" folder.  This file contains information used by cmake to build the executables.  To compile in debug mode, change the value after ``\texttt{CMAKE\_BUILD\_TYPE:STRING=}" from ``Release" to ``Debug", and retype the command:\\\\ \texttt{\$ make}\\\\
+Four executables - \texttt{GOMC\_CPU\_GEMC} (Gibbs ensemble), \texttt{GOMC\_CPU\_NVT} (NVT ensemble), \texttt{GOMC\_CPU\_NPT} (isobaric-isothermal ensemble), and \texttt{GOMC\_CPU\_GCMC} (Grand canonical ensemble) - will be produced. By default, the distribution compiles in release mode.  To compile in debug mode (if you're using the code as a developer), open the file ``\texttt{CMakeCache.txt}" while still in the ``bin" folder.  This file contains information used by cmake to build the executables.  To compile in debug mode, change the value after ``\texttt{CMAKE\_BUILD\_TYPE:STRING=}" from ``Release" to ``Debug", and retype the command:\\\\ \texttt{\$ make}\\\\
 The output executables should now be compiled with debugger symbols.
 You can also swap the compiler by modifying the ``\texttt{CMAKE\_CXX\_COMPILER}" variable. For more information, refer to the CMake documentation.\\
 Running GOMC in parallel using OpenMP:\\
 To run the parallel version of CPU code, it needs to be compiled with openmp library. Open the file ``\texttt{CMakeCache.txt}", while still in the ``bin" folder, and change the value after ``\texttt{CMAKE\_CXX\_FLAGS\_RELEASE:STRING=}" from ``-O3 -DNDEBUG" to ``-O3 -qopenmp -DNDEBUG".\\
 And retype the command:\\\\
 \texttt{\$ make}\\\\
+
+\newpage
+
+%INPUT FILE
 \section{Input File Formats}
 In order to run simulation in GOMC, the following files need to be provided:
 \begin{itemize}
@@ -947,17 +984,12 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<DOUBLE>$ - Define switch distance in angstrom. If the ``SWITCH'' function is chosen, \texttt{Rswitch} needs to be defined; otherwise, the program will be terminated. 
 	\end{itemize}
 \colorbox{yellow}{\texttt{NOTE:}} In CHARMM force field, the 1-4 interaction needs to be considered. Choosing ``Exclude 1-3'' will modify 1-4 interaction based on 1-4 parameter in parameter file. If a kind force field is used, where 1-4 interaction needs to be ignored, such as TraPPE, either ``exclude 1-4'' needs to be chosen or 1-4 parameter needs to be assigned a value of zero in the parameter file.
-\item [ElectroStatic] Considers coulomb interaction or not.
+\item [ElectroStatic] Considers coulomb interaction or not. This function will be discussed further in the Intermolecular energy and Virial calculation section.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - True if coulomb interaction needs to be considered and false if not.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} If MARTINI force field was used and charged molecule was used in simulation, ElectroStatic needs to be turn on. MARTINI force field uses short range coulomb interaction with constant dielectric 15.0.
-\item [Dielectric] Defines dielectric constant for coulomb interaction in MARTINI force field.
-	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - Sets dielectric value used in coulomb interaction.
-	\end{itemize}
-	\colorbox{yellow}{\texttt{NOTE:}} In MARTINI force field, \texttt{Dielectric} needs to be set to 15.0. If MARTINI force field was chosen and if \texttt{Dielectric} was not specified, a default value of 15.0 will be assigned.
-\item [Ewald] Considers standard Ewald summation method for electrostatic calculation.
+\item [Ewald] Considers standard Ewald summation method for electrostatic calculation. This function will be discussed further in the Intermolecular energy and Virial calculation section.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - ``true'' if Ewald summation calculation needs to be considered and ``false'' if not.
 	\end{itemize}
@@ -967,11 +999,16 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<BOOLEAN>$ - ``true'' to store reciprocal terms of Ewald summation calculation and ``false'' if not.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} By default, \texttt{CachedFourier} will be set to ``true'' if not value was set.
-\item [Tolerance] Specifies th accuracy of the Ewald summation calculation. Ewald separation parameter and number of reciprocal vectors for the Ewald summation are determined based on the accuracy parameter.
+\item [Tolerance] Specifies the accuracy of the Ewald summation calculation. Ewald separation parameter and number of reciprocal vectors for the Ewald summation are determined based on the accuracy parameter.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - Sets the accuracy in Ewald summation calculation. A reasonable value for te accuracy is 0.00001.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} If ``Ewald'' was chosen and no value was set for Tolerance, the program will be terminated.
+\item [Dielectric] Defines dielectric constant for coulomb interaction in MARTINI force field.
+	\begin{itemize}
+	\item Value 1: $<DOUBLE>$ - Sets dielectric value used in coulomb interaction.
+	\end{itemize}
+	\colorbox{yellow}{\texttt{NOTE:}} In MARTINI force field, \texttt{Dielectric} needs to be set to 15.0. If MARTINI force field was chosen and if \texttt{Dielectric} was not specified, a default value of 15.0 will be assigned.
 \item [PressureCalc] Considers to calculate the pressure or not. If it is set to true, the frequency of pressure calculation need to be set.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``True'' enabling pressure calculation during the simulation, ``false'' disabling pressure calculation.
@@ -1000,7 +1037,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\begin{itemize}
 	\item Value 1: $<ULONG>$ - Equilibration steps
 	\end{itemize}
-\item [AdjSteps] Sets the number of steps per adjustment to the maximum constants associated with each move (e.g. maximum distance in \textit{xyz} to displace, the maximum volume in A3 to swap, etc.)
+\item [AdjSteps] Sets the number of steps per adjustment to the maximum constants associated with each move (e.g. maximum distance in \textit{xyz} to displace, the maximum volume in $\AA^3$ to swap, etc.)
 	\begin{itemize}
 	\item Value 1: $<ULONG>$ - Number of steps per move adjustment\\
 	\colorbox{lightgray}{
@@ -1223,370 +1260,8 @@ The next section controls the output of the energy/particle sample file and the 
 	\end{tabular}}
 \end{description}
 \newpage
-\section{Sample Files}
-Here's a sample of how a typical \textcolor{orange}{NVT ensemble} control file might be expected to look:\\
-\texttt{\#==================================================}\\
-\texttt{\#=       GOMC - NVT Control example     }\\
-\texttt{\#==================================================}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#\#=====--------  INPUT  --------=====}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ENABLE, STEP}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Restart	 	false}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# KIND \{RESTART, RANDOM, INTSEED\}}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{PRNG     	RANDOM}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# FORCE FIELD}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ParaTypeCHARMM	 true}\\
-\texttt{Parameters     	 ./../common/Par\_MODEL\_NAME.inp}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# INPUT PDB FILES}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Coordinates 0    STEP3\_START\_XX\_PHA\_BOX\_0.pdb}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# INPUT PSF FILES}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Structure 0  	 STEP3\_START\_XX\_PHA\_BOX\_0.psf}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#  =======------------- SYSTEM ----------------=========}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# SIMULATION CONDITION}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Temperature     200.00}\\
-\texttt{Potential       VDW}\\
-\texttt{LRC		true}\\
-\texttt{Rcut		10}\\
-\texttt{Exclude 	1-4}\\
-\texttt{}\\
-\newpage
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ELECTROSTATIC}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ElectroStatic		        true}\\
-\texttt{Ewald				false}\\
-\texttt{Tolerance			0.00001}\\
-\texttt{1-4scaling			0.0}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# STEPS}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{RunSteps          25000000}\\
-\texttt{EqSteps		  5000000}\\
-\texttt{AdjSteps	 	  1000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# MOVE FREQUENCY}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{DisFreq              		 0.80}\\
-\texttt{RotFreq		    	         0.10}\\
-\texttt{IntraSwapFreq		         0.10}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# PRESSURE CALCULATION}\\ 
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{PressureCalc	true 		10000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# BOX DIMENSION \#, X, Y, Z}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{BoxDim  0    35.00  35.00  35.00}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# CBMC TRIALS}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CBMC\_First   10}\\
-\texttt{CBMC\_Nth     4}\\
-\texttt{CBMC\_Ang     100}\\
-\texttt{CBMC\_Dih     30}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#  =======--------------- OUTPUT --------------=========}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# OUTPUT FILE NAME}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutputName  AR\_200\_00\_K\_2220\_r5}\\
-\newpage
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# STATISTICS	ENABLE,	FREQ.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CoordinatesFreq      true   1000000}\\
-\texttt{RestartFreq  	         true   1000000}\\
-\texttt{ConsoleFreq            true   1000000}\\
-\texttt{BlockAverageFreq   true   1000000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ENABLE: BLK AVF., FLUCK.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutEnergy         true    true}\\
-\texttt{OutPressure 	   true    true}\\
-\texttt{OutMolNum       false   false}\\ 
-\texttt{OutDensity         false   false}\\
-\texttt{}\\
-\newpage
-Here's a sample of how a typical \textcolor{blue}{Gibbs ensemble} control file might be expected to look:\\
-\texttt{=============================================================}\\
-\texttt{=       GOMC - Gibbs ensemble Control example     }\\
-\texttt{=============================================================}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ENABLE, STEP}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Restart	 	false}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# KIND {RESTART, RANDOM, INTSEED}}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{PRNG     		INTSEED}\\
-\texttt{Random\_Seed  	49}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# FORCE FIELD}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ParaTypeEXOTIC	 true}\\
-\texttt{Parameters     	 Par\_MODEL\_NAME.inp}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# INPUT PDB FILES}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Coordinates 0    STEP3\_START\_XX\_PHA\_BOX\_0.pdb}\\
-\texttt{Coordinates 1	   STEP3\_START\_XX\_PHA\_BOX\_1.pdb}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# INPUT PSF FILES}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Structure 0  	 STEP3\_START\_XX\_PHA\_BOX\_0.psf}\\
-\texttt{Structure 1	 STEP3\_START\_XX\_PHA\_BOX\_1.psf}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#  =======------------------- SYSTEM --------------------==========}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# GEMC TYPE (DEFULT IS NVT\_GEMC)}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{GEMC 		NPT}\\
-\texttt{Pressure         2.50}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# SIMULATION CONDITION}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Temperature     200.00}\\
-\texttt{Potential 		SWITCH}\\
-\texttt{LRC		false}\\
-\texttt{Rswitch		7}\\
-\texttt{Rcut		10}\\
-\texttt{RcutLow		1.0}\\
-\texttt{Exclude 		1-4}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ELECTROSTATIC}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Ewald			false}\\
-\texttt{ElectroStatic		false}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# STEPS}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{RunSteps           25000000}\\
-\texttt{EqSteps		   5000000}\\
-\texttt{AdjSteps		   1000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# MOVE FREQUENCY}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{DisFreq         	  0.69}\\
-\texttt{RotFreq		  0.10}\\
-\texttt{VolFreq		  0.01}\\
-\texttt{SwapFreq	  0.20}\\
-\texttt{IntraSwapFreq	  0.00}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# PRESSURE CALCULATION}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{PressureCalc	true 		10000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# BOX DIMENSION \#, X, Y, Z}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{BoxDim  0    35.00  35.00  35.00}\\
-\texttt{BoxDim  1    45.00  45.00  45.00}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# CBMC TRIALS}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CBMC\_First   8}\\
-\texttt{CBMC\_Nth     4}\\
-\texttt{CBMC\_Ang     100}\\
-\texttt{CBMC\_Dih     30}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#  =======-------------------- OUTPUT --------------------=========}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# OUTPUT FILE NAME }\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutputName  AR\_200\_00\_K\_2220\_r5}\\
-\newpage
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# STATISTICS	ENABLE,	FREQ.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CoordinatesFreq      true   1000000}\\
-\texttt{RestartFreq  	         true   1000000}\\
-\texttt{ConsoleFreq            true   1000000}\\
-\texttt{BlockAverageFreq   true   1000000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ENABLE: BLK AVF., FLUCK.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutEnergy         true    true}\\
-\texttt{OutPressure      true    true}\\
-\texttt{OutMolNum       true    true}\\
-\texttt{OutDensity        true    true}\\
-\newpage
-Here’s a sample of how a typical \textcolor{green}{grand canonical} ensemble control file might be expected to look:\\
-\texttt{=============================================================}\\
-\texttt{= GOMC - Grand canonical ensemble Control example }\\
-\texttt{=============================================================}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ENABLE, STEP}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Restart	 	false   }\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# KIND {RESTART, RANDOM, INTSEED}}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{PRNG     		RANDOM}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# FORCE FIELD}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ParaTypeCHARMM	   false}\\
-\texttt{ParaTypeEXOTIC	   true}\\
-\texttt{Parameters        	   Par\_MODEL\_NAME.inp}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# INPUT PDB FILES}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Coordinates 0    STEP3\_START\_XX\_PHA\_BOX\_0.pdb  }\\
-\texttt{Coordinates 1	   STEP3\_START\_XX\_PHA\_ Reserv\_BOX\_1.pdb}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# INPUT PSF FILES}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Structure 0  	 STEP3\_START\_XX\_PHA\_BOX\_0.psf  }\\
-\texttt{Structure 1	 STEP3\_START\_XX\_PHA\_Reserv\_BOX\_1.psf}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#  =======------------------- SYSTEM --------------------==========}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# SIMULATION CONDITION}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Temperature     200.00}\\
-\texttt{Potential 		VDW}\\
-\texttt{LRC		true}\\
-\texttt{Rcut		10}\\
-\texttt{Exclude 		1-4}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ELECTROSTATIC}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{Ewald			true}\\
-\texttt{ElectroStatic		true}\\
-\texttt{CachedFourier	true}\\
-\texttt{Tolerance		0.00001}\\
-\texttt{1-4scaling		0.0}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# STEPS }\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{RunSteps           25000000}\\
-\texttt{EqSteps		   5000000}\\
-\texttt{AdjSteps		   1000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# MOVE FREQUENCY}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{DisFreq         	  0.20}\\
-\texttt{RotFreq		  0.20}\\
-\texttt{SwapFreq	  0.60}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# PRESSURE CALCULATION}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{PressureCalc	false}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# BOX DIMENSION \#, X, Y, Z}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{BoxDim  0    35.00  35.00  35.00}\\
-\texttt{BoxDim  1    45.00  45.00  45.00}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# CBMC TRIALS}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CBMC\_First        8}\\
-\texttt{CBMC\_Nth         4}\\
-\texttt{CBMC\_Ang     100}\\
-\texttt{CBMC\_Dih        30}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#          Mol. Name     Chem. Pot.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{ChemPot    DME             -2230}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\#  =======-------------------- OUTPUT --------------------=========}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# OUTPUT FILE NAME }\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutputName  DME\_200\_00\_K\_2220}\\
-\newpage
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# STATISTICS	ENABLE,	FREQ.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{CoordinatesFreq      true   1000000}\\
-\texttt{RestartFreq	         true   1000000}\\
-\texttt{ConsoleFreq            true   1000000}\\
-\texttt{BlockAverageFreq   true   1000000}\\
-\texttt{HistogramFreq         true   100000}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# OutHistSettings}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{DistName	 dis}\\
-\texttt{HistName	 his}\\
-\texttt{RunNumber	 5}\\
-\texttt{RunLetter	 a}\\
-\texttt{SampleFreq	 200}\\
-\texttt{}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{\# ENABLE: BLK AVF., FLUCK.}\\
-\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-\texttt{OutEnergy                 true    	true}\\
-\texttt{OutPressure              false   	false}\\
-\texttt{OutMolNum               true    	true}\\
-\texttt{OutDensity                false   	false}\\
-\texttt{OutSurfaceTension   false	false}\\
-\newpage
+
+%OUTPUT
 \section{GOMC's Output Files, Terminal Output}
 GOMC currently supports several kinds of output:
 \begin{itemize}
@@ -1707,6 +1382,9 @@ At the beginning of each file, the title of each property followed by their aver
 \texttt{cat Blk\_OUTPUTNAME\_BOX\_0.dat | awk `\{{print \$13}\}'}
 }\\\\
 Here, ``Blk\_OUTPUTNAME\_BOX\_0.dat'' is the block-average file for simulation box 0 and ``\$13'' represents the 13th column of the block file.
+\newpage
+
+%RUNNING
 \section{Putting it all together: Running a GOMC Simulation}
 It is strongly recommended that you download the test system provided at\\
 \url{http://gomc.eng.wayne.edu/downloads.html} or \\
@@ -1722,7 +1400,7 @@ The general plan for running the simulation is:
 \item Run the simulation in the terminal.
 \item Analyze the output.
 \end{enumerate}
-Please, complete steps 1 and 2; then, traverse to the directory, which should now contain a single file ``GOMC\_Serial\_GEMC''.
+Please, complete steps 1 and 2; then, traverse to the directory, which should now contain a single file ``GOMC\_CPU\_GEMC''.
 Next, six files need to be made:
 \begin{itemize}
 \item PDB file for isobutane
@@ -1952,7 +1630,7 @@ W_{ij}(\texttt{switch}) = \Bigg[6 C_{n_{ij}} \epsilon_{ij} \bigg[\frac{n_{ij}}{6
 \end{figure}
 
 %SWITCH MARTINI
-\subsection{SWITCH} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{Rswitch} distance.
+\subsection{SWITCH (MARTINI)} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{Rswitch} distance.
 \begin{itemize}
 	\item Potential Calculation: Interactions between atoms can be modeled with an n$-$6 potential. In standard \texttt{MARTINI}, $n$ is equal to 12,
 	\begin{equation}
@@ -2101,7 +1779,7 @@ In this section, the virial and energy equation of electrostatic interaction for
 \end{itemize}
 
 %MARTINI
-\subsection{SWITCH} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{"Rswitch = 0.0"} distance.
+\subsection{SWITCH (MARTINI)} This option in \texttt{MARTINI} force field smoothly forces the potential energy to be zero at \texttt{Rcut} distance and starts modifying the potential at \texttt{"Rswitch = 0.0"} distance.
 \begin{itemize}
 	\item Potential Calculation: Coulomb interactions between atoms can be modeled as,
 	\begin{equation}
