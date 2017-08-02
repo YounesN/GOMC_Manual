@@ -200,41 +200,14 @@ To compile it, a Fortran language compiler is needed, such as gfortran.  Many Li
 Packmol allows a specified number of molecules to be packed at defined separating distances within a certain region of space.  One of Packmol?s limitations is that it is unaware of topology; it treats each molecule or group of molecules as a rigid set of points.\\\\
 \textit{\colorbox{red}{WARNING}: Another more serious limitation is that it is not aware of periodic boundary conditions (PBC).  As a result, when using Packmol to pack PDBs for GOMC, it is recommended to pack to a box 1 Angstroms smaller than the simulation box size.  This prevents hard overlaps over the periodic boundary.}
 
-\section{Other Useful Software Tools}
-\subsection{Grace}
-Grace is a piece of graphing software written and maintained by the Weizmann Institute of Science's Plasma Laboratory (Rehovot, Israel). Mostly used in Linux, it can also be compiled in Windows.  The developers warn it may be missing some functionality.\\
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/grace}
-\end{figure}
-In-depth information and the source can be found on the project page, here:\\\\
-\url{http://plasma-gate.weizmann.ac.il/Grace}\\\\
-When compiled, Grace's executable in Linux is typically named ``xmgrace".  This tool allows the production of high quality, precise line and dot graphs, ideal for visualizing much of the thermodynamic data from the GOMC engine.  Below is an example of the results of simulations of saturated VLE densities of linear alkanes produced with Grace.
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/alkanes}
-\end{figure}
-
-\subsection{Cygwin}
-Cygwin is one option to assist in building and visualizing systems in Windows. It provides Microsoft Windows users with a Unix-like environment and command-line interface, and offers Windows-compatible ports of common Linux applications.\\\\
-\url{https://cygwin.com}
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/cygwin}
-\end{figure}
-The software is a free and open source, licensed under the GNU General Public License version 3. Its primary maintainers are Red Hat Inc. and NetApp. One of the most impressive abilities of Cygwin is its ability to launch a full Windows-compatible X-server Window, which allows convenient visualization of Linux app GUIs. It is compatible with the Grace graphing software. In practice, this package behaves most analogously to a Linux virtual machine in Windows.
 \newpage
 %COMLILING
 \section{Compiling GOMC}
 \subsection{Extracting the code}
 GOMC is distributed as a compressed folder, containing the source and build system. To compile the code after downloading it, the first step is to extract the compressed build folder.\\
-In Windows, the folder for the GPU code is compressed using a standard *.zip file format. To unzip simply use a utility like Peazip: \\\\
-\url{http://peazip.sourceforge.net/}\\\\
-Below is an example of what the downloaded code looks like when unzipping in Peazip.
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/peazip}
-\end{figure}
+In Windows, the folder for the GPU code is compressed using a standard *.zip file format. To unzip simply use a utility like Peazip: \\
+\url{http://peazip.sourceforge.net}\\
+
 In Linux, the GPU and CPU codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
 \texttt{\$ tar -xzvf <file name>.tar.gz}
 \subsection{Compiling the code}
@@ -369,8 +342,8 @@ With that overview of the format in mind, the following steps describe how a PDB
 }
 \item Next, packings are calculated to place the simulation in a region of vapor-liquid coexistence. There are a couple of ways to do this in Gibbs ensemble:
 \begin{itemize}
-\item Pack both boxes to a single ?middle? density, which is an average of the liquid and vapor densities.
-\item Same as 1, but add a modest amount to axis of one box (e.g. 10-30 A).  This technique can be handy in the constant pressure Gibbs ensemble.
+\item Pack both boxes to a single middle density, which is an average of the liquid and vapor densities.
+\item Same as previous method, but add a modest amount to axis of one box (e.g. 10-30 A).  This technique can be handy in the constant pressure Gibbs ensemble.
 \item Pack one box to the predicted liquid density and the other to the vapor density.
 \end{itemize}
 \begin{figure}[H]
@@ -573,7 +546,7 @@ As seen above, the following are recognized, read and used:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/bonds}
-\caption{Image Courtesy of Wikimedia Commons}
+\caption{Oscillations about the equilibrium bond length}
 \end{figure}
 \item \texttt{ANGLES}
 \begin{itemize}
@@ -581,7 +554,7 @@ As seen above, the following are recognized, read and used:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/angle}
-\caption{Image Courtesy of Wikimedia Commons}
+\caption{Oscillations of 3 atoms about an equilibrium bond angle}
 \end{figure}
 \end{itemize}
 \item \texttt{DIHEDRALS} 
@@ -591,7 +564,7 @@ As seen above, the following are recognized, read and used:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/dihedrals}
-\caption{Image Courtesy of Wikimedia Commons}
+\caption{Torsional rotation of 4 atoms about a central bond}
 \end{figure}
 \item \texttt{NONBONDED}
 \begin{itemize}
@@ -599,8 +572,8 @@ As seen above, the following are recognized, read and used:
 \end{itemize}
 \begin{figure}[H]
 \centering
-\includegraphics[scale=1.0]{images/nonbonded}
-\caption{Image Courtesy of Wikimedia Commons}
+\includegraphics[scale=0.3]{images/nonbonded}
+\caption{Non-bonded energy terms (electrostatics and Lenard-Jones)}
 \end{figure}
 
 \item \texttt{NBFIX}
