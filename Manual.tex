@@ -200,29 +200,6 @@ To compile it, a Fortran language compiler is needed, such as gfortran.  Many Li
 Packmol allows a specified number of molecules to be packed at defined separating distances within a certain region of space.  One of Packmol?s limitations is that it is unaware of topology; it treats each molecule or group of molecules as a rigid set of points.\\\\
 \textit{\colorbox{red}{WARNING}: Another more serious limitation is that it is not aware of periodic boundary conditions (PBC).  As a result, when using Packmol to pack PDBs for GOMC, it is recommended to pack to a box 1 Angstroms smaller than the simulation box size.  This prevents hard overlaps over the periodic boundary.}
 
-\section{Other Useful Software Tools}
-\subsection{Grace}
-Grace is a piece of graphing software written and maintained by the Weizmann Institute of Science's Plasma Laboratory (Rehovot, Israel). Mostly used in Linux, it can also be compiled in Windows.  The developers warn it may be missing some functionality.\\
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/grace}
-\end{figure}
-In-depth information and the source can be found on the project page, here:\\\\
-\url{http://plasma-gate.weizmann.ac.il/Grace}\\\\
-When compiled, Grace's executable in Linux is typically named ``xmgrace".  This tool allows the production of high quality, precise line and dot graphs, ideal for visualizing much of the thermodynamic data from the GOMC engine.  Below is an example of the results of simulations of saturated VLE densities of linear alkanes produced with Grace.
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/alkanes}
-\end{figure}
-
-\subsection{Cygwin}
-Cygwin is one option to assist in building and visualizing systems in Windows. It provides Microsoft Windows users with a Unix-like environment and command-line interface, and offers Windows-compatible ports of common Linux applications.\\\\
-\url{https://cygwin.com}
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/cygwin}
-\end{figure}
-The software is a free and open source, licensed under the GNU General Public License version 3. Its primary maintainers are Red Hat Inc. and NetApp. One of the most impressive abilities of Cygwin is its ability to launch a full Windows-compatible X-server Window, which allows convenient visualization of Linux app GUIs. It is compatible with the Grace graphing software. In practice, this package behaves most analogously to a Linux virtual machine in Windows.
 \newpage
 %COMLILING
 \section{Compiling GOMC}
@@ -230,11 +207,6 @@ The software is a free and open source, licensed under the GNU General Public Li
 GOMC is distributed as a compressed folder, containing the source and build system. To compile the code after downloading it, the first step is to extract the compressed build folder.\\
 In Windows, the folder for the GPU code is compressed using a standard *.zip file format. To unzip simply use a utility like Peazip: \\\\
 \url{http://peazip.sourceforge.net/}\\\\
-Below is an example of what the downloaded code looks like when unzipping in Peazip.
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.6]{images/peazip}
-\end{figure}
 In Linux, the GPU and CPU codes are compressed using gzip and tar (*.tar.gz).  To extract, simply move to the desire folder and type in the command line:\\\\
 \texttt{\$ tar -xzvf <file name>.tar.gz}
 \subsection{Compiling the code}
@@ -264,15 +236,15 @@ Other options are ``$<$ None $\mid$ Debug $\mid$ ReleaseWithDebInfo $\mid$ MinSi
 \item [ENSEMBLE\_GPU\_GEMC] You can turn the compilation of GPU version of GEMC ensemble on or off using this option.\\
 \texttt{-DENSEMBLE\_GPU\_GEMC=$<$On $\mid$ Off $>$}
 \end{description}
-\subsubsection{GPU code}
-\underline{Compilation on Windows}\\
+\subsubsection{GPU Code}
+\underline{\textbf{Compilation on Windows}}\\
 To compile the GPU code, CUDA is required and can be downloaded from:\\\\
 \url{https://developer.nvidia.com/cuda-downloads}.\\\\
 Once you have the executable you can follow the instruction guide provided by NVIDIA and install the CUDA:\\\\
 \url{http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html}\\\\
 Be sure to check the requirements mentioned as in most cases you won't be able to run CUDA on latest version of Visual Studio (Visual Studio 2017 is not supported at the time of writing this guide).\\
 To generate the Visual Studio project files you can run ``cmake''. You could use either the cmake GUI or the cmake command line to generate the project. If you are using cmake GUI make sure you select the correct compiler verion (e.g Visual Studio 2015 compiler is version 14.0). Finally, you can simply open the project and build the executables with Visual Studio. \\\\
-\underline{Compilation on Linux}\\
+\underline{\textbf{Compilation on Linux}}\\
 Same as Windows compilation, CUDA toolkit is required to compile GPU code on Linux. If you do not have CUDA, cmake will only generate CPU code.\\
 To compile GOMC on Linux give permission to ``metamake.sh" and run it.\\\\
 \texttt{\$ chmod u+x metamake.sh}\\
@@ -282,9 +254,9 @@ This script will create a directory and run cmake for you. Once it's complete, y
 It should generate all the executables in the ``bin" directory.
 
 \subsubsection{CPU Code}
-\underline{Compilation on Windows}\\
+\underline{\textbf{Compilation on Windows}}\\
 See GPU ``Compilation on Windows" section and follow an identical procedure for the released CPU code (Except you don't need CUDA if you only need CPU executables). See \texttt{README.md} for instructions on how to use the CMake-GUI to build the configuration and solution files necessary for the Windows build.\\\\
-\underline{Compilation on Linux}\\
+\underline{\textbf{Compilation on Linux}}\\
 For the serial code, which uses cmake for compilation, go to the base directory and type in the command line:\\\\
 \texttt{\$ ./metamake.sh}\\\\
 This cmake script will create a directory named ``bin".  Enter this directory:\\\\
@@ -373,6 +345,10 @@ A few important \colorbox{yellow}{Notes}/\colorbox{red}{Warnings} on Undocumente
 \item VMD requires a constant number of ATOMs in a multi-frame PDB (multiple records terminated by ``END" in a single file). To compensate for this, all atoms from all boxes in the system are written to the output PDBs of this code.
 \item For atoms not currently in a box, the coordinates are set to $<0.00, 0.00, 0.00>$
 \item The occupancy is commonly just set to ``1.00" and is left unused by many codes. We recycle this legacy parameter by using it to denote, in our output PDBs, the box a particle is in (box 0  occupancy=0.00 ; box 1  occupancy=1.00)
+\item \textbf{The beta value in GOMC code is used to define the mobility of the molecule. }
+	\subitem \textbf{Beta  = 0.00: molecule can move and transfer within and between boxes.}
+	\subitem \textbf{Beta = 1.00: molecule is fixed in its position.}
+	\subitem \textbf{Beta = 2.00: molecule can move within the box but cannot be transferred   between boxes.}
 \item As the x, y, and z coordinates are fixed point with only three digits of precision, the energy values you get when restarting may be mildly different, particularly for bonded interactions due to roundoff in the coordinates.  This will eventually be remedied by the implementation of a full-precision trajectory (e.g. DCD) file.
 \item The ``ISB" entry in columns 73-75 is not an official part of the PDB standard.  This is a proprietary entry called ``Segname", which has been embraced by NAMD and some other codes.
 \end{itemize}
@@ -392,14 +368,10 @@ With that overview of the format in mind, the following steps describe how a PDB
 }
 \item Next, packings are calculated to place the simulation in a region of vapor-liquid coexistence. There are a couple of ways to do this in Gibbs ensemble:
 \begin{itemize}
-\item Pack both boxes to a single ?middle? density, which is an average of the liquid and vapor densities.
-\item Same as 1, but add a modest amount to axis of one box (e.g. 10-30 A).  This technique can be handy in the constant pressure Gibbs ensemble.
+\item Pack both boxes to a single middle density, which is an average of the liquid and vapor densities.
+\item Same as previous method, but add a modest amount to axis of one box (e.g. 10-30 A).  This technique can be handy in the constant pressure Gibbs ensemble.
 \item Pack one box to the predicted liquid density and the other to the vapor density.
 \end{itemize}
-\begin{figure}[H]
-\centering
-\includegraphics[scale=1.0]{images/pack2}
-\end{figure}
 A good reference for getting the information needed to estimate packing is the NIST Web Book database of pure compounds:\\\\
 \url{http://webbook.nist.gov/chemistry/}\\\\
 \item After packing is determined, a basic pack can be performed with a Packmol script.  Here is one example:\\\\
@@ -566,7 +538,20 @@ More in-depth information can be found in the following links:\\
 ``NAMD Tutorial: 25. Topology Files"\\
 \url{http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node25.html}
 
-\colorbox{yellow}{\texttt{NOTE:}} Links are courtesy of UIUC.\\
+\colorbox{yellow}{\texttt{NOTE:}} Links are courtesy of UIUC.\\\\
+\colorbox{red}{\texttt{Warning:}} In order to make topology file for a linear molecule such as water, it needs to be sure that atoms are generated and bonded in a linear order. Otherwise CBMC algorithm would fail. However, for branch molecules, any order can be used to generate and bond the atoms of a molecule.\\
+Here's an example of a residue definition for water:\\\\
+\colorbox{lightgray}{
+\begin{tabular}{l}
+\texttt{RESI SPCE ~~ 0.00 ! SPC/E water}\\
+\texttt{GROUP}\\
+\texttt{ATOM H1 HO    0.4238 !  ~ O1}\\
+\texttt{ATOM O1 OH   -0.8476 !   H1~H2}\\
+\texttt{ATOM H2 HO    0.4238 !   }\\
+\texttt{BOND H1 O1  O1 H2 }\\
+\texttt{PATCHING FIRS NONE LAST NONE}
+\end{tabular}}\\\\
+
 \subsection{Parameter File(s):}
 Currently, GOMC uses a single parameter file and the user has the two kinds of parameter file choices:
 \begin{itemize}
@@ -597,7 +582,7 @@ As seen above, the following are recognized, read and used:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/bonds}
-\caption{Image Courtesy of Wikimedia Commons}
+\caption{Oscillations about the equilibrium bond length}
 \end{figure}
 \item \texttt{ANGLES}
 \begin{itemize}
@@ -605,7 +590,7 @@ As seen above, the following are recognized, read and used:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/angle}
-\caption{Image Courtesy of Wikimedia Commons}
+\caption{Oscillations of 3 atoms about an equilibrium bond angle}
 \end{figure}
 \end{itemize}
 \item \texttt{DIHEDRALS} 
@@ -615,7 +600,7 @@ As seen above, the following are recognized, read and used:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=1.0]{images/dihedrals}
-\caption{Image Courtesy of Wikimedia Commons}
+\caption{Torsional rotation of 4 atoms about a central bond}
 \end{figure}
 \item \texttt{NONBONDED}
 \begin{itemize}
@@ -623,8 +608,8 @@ As seen above, the following are recognized, read and used:
 \end{itemize}
 \begin{figure}[H]
 \centering
-\includegraphics[scale=1.0]{images/nonbonded}
-\caption{Image Courtesy of Wikimedia Commons}
+\includegraphics[scale=0.3]{images/nonbonded}
+\caption{Non-bonded energy terms (electrostatics and Lenard-Jones)}
 \end{figure}
 
 \item \texttt{NBFIX}
@@ -756,18 +741,6 @@ In this section, input file names are listed. In addition, if you want to restar
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - true if restart, false otherwise\\
 	\end{itemize}
-\item [FirstStep] Determines what step to restart from. If Restart was set to true, step number needs to be specified; otherwise, the program will terminate.\\
-	\begin{itemize}
-	\item Value 1: $<ULONG>$ - step to restart from\\
-	\colorbox{lightgray}{
-	\begin{tabular}{l}
-	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{\# enable, step}\\
-	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{Restart     true}\\
-	\texttt{FirstStep   1000000}\\
-	\end{tabular}}
-	\end{itemize}
 \item [PRNG] Dictates how to start the pseudo-random number generator (PRNG)
 	\begin{itemize}
 	\item Value 1: $<STRING>$
@@ -776,16 +749,15 @@ In this section, input file names are listed. In addition, if you want to restar
 		\colorbox{lightgray}{
 		\begin{tabular}{l}
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{\# kind \{RESTART, RANDOM, INTSEED\}}\\
+		\texttt{\# kind \{RANDOM, INTSEED\}}\\
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{PRNG RANDOM}\\
 		\end{tabular}}
-		\item \texttt{INTSEED}: This option ``seeds" the Mersenne Twister PRNG with a standard integer. When the same integer is used, the generated PRNG stream should be the same every time, which is helpful in tracking down bugs.
-		\item \texttt{RESTART}: Used for restarting a previous simulation. This option in the Mersenne Twister's state from a saved file.\\
+		\item \texttt{INTSEED}: This option ``seeds" the Mersenne Twister PRNG with a standard integer. When the same integer is used, the generated PRNG stream should be the same every time, which is helpful in tracking down bugs.\\
 		\colorbox{lightgray}{
 		\begin{tabular}{l}
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{\# kind \{RESTART, RANDOM, INTSEED\}}\\
+		\texttt{\# kind \{RANDOM, INTSEED\}}\\
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{PRNG RESTART}\\
 		\end{tabular}}
@@ -797,7 +769,7 @@ In this section, input file names are listed. In addition, if you want to restar
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{\# kind \{RESTART, RANDOM, INTSEED\}}\\
+	\texttt{\# kind \{RANDOM, INTSEED\}}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{PRNG INTSEED}\\
 	\texttt{Random\_Seed 50}\\
@@ -870,12 +842,25 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{Coordinates 0 STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\
 	\texttt{Coordinates 1 STEP3\_START\_ISB\_sys\_BOX\_1.pdb}\\
 	\end{tabular}}
+	
+	\colorbox{yellow}{\texttt{NOTE:}} In case of \texttt{Restart   true}, the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb) can be used for both boxes. \\\\
+	Example of Gibbs ensemble when Restart mode is active\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
+	\texttt{\# INPUT PDB FILES}\\
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
+	\texttt{Coordinates 0 ISB\_T\_270\_k\_BOX\_0\_restart.pdb}\\
+	\texttt{Coordinates 1 ISB\_T\_270\_k\_BOX\_1\_restart.pdb}\\
+	\end{tabular}}
 	\end{itemize}
+	
 \item [Structures] Defines the PSF filenames (structures) for each box in the system.
 	\begin{itemize}	
 	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0').\\
 	\item Value 2: $<STRING>$ - Sets PSF file name\\\\
-	\colorbox{yellow}{\texttt{NOTE:}} NVT and NPT ensembles requires only one PSF file and GEMC/GCMC requires two PSF files. If the number of PSF files is not compatible with the simulation type, the program will terminate. \\\\
+	\colorbox{yellow}{\texttt{NOTE:}} NVT and NPT ensembles requires only one PSF file and GEMC/GCMC requires two PSF files. If the number of PSF files is not compatible with the simulation type, the program will terminate. \\
+	
 	Example of NVT or NPT ensemble\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
@@ -890,11 +875,24 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{\# INPUT PSF FILES}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{Structure 0 STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\
-	\texttt{Structure 1 STEP3\_START\_ISB\_sys\_BOX\_1.pdb}\\
+	\texttt{Structure 0 STEP3\_START\_ISB\_sys\_BOX\_0.psf}\\
+	\texttt{Structure 1 STEP3\_START\_ISB\_sys\_BOX\_1.psf}\\
+	\end{tabular}}
+	
+	\colorbox{yellow}{\texttt{NOTE:}} In case of \texttt{Restart   true}, the PSF output file from GOMC (OutputName\_merged.psf) can be used for both boxes. \\\\
+	Example of Gibbs ensemble when Restart mode is active\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
+	\texttt{\# INPUT PSF FILES}\\
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
+	\texttt{Structure 0 ISB\_T\_270\_k\_merged.psf}\\
+	\texttt{Structure 1 ISB\_T\_270\_k\_merged.psf}\\
 	\end{tabular}}
 	\end{itemize}
+	
 \end{description}
+
 \subsubsection{System Settings for During Run Setup}
 This section contains all the variables not involved in the output of data during the simulation, or in the reading of input files at the start of the simulation.  In other words, it contains settings related to the moves, the thermodynamic constants (based on choice of ensemble), and the length of the simulation.\\
 Note that some tags, or entries for tags, are only used in certain ensembles (e.g. Gibbs ensemble). These cases are denoted with colored text.\\
@@ -905,6 +903,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<STRING>$ - allows you to pick between isovolumetric (``NVT") and isobaric (``NPT") Gibbs ensemble simulations
 		\begin{itemize}
 		\item NVT: Run simulation with constant molecule number, volume, and temperature.\\
+		\item NPT: Run simulation with constant molecule number, pressure, and temperature.\\
 		\colorbox{lightgray}{
 		\begin{tabular}{l}
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -912,7 +911,6 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{GEMC    NVT}\\
 		\end{tabular}}
-		\item NPT: Run simulation with constant molecule number, pressure, and temperature.
 		\end{itemize}
 	\end{itemize}
 \item [Pressure] If ``NPT" simulation is chosen, imposed pressure (in bar) needs to be specified; otherwise, the program will terminate.
@@ -929,8 +927,12 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\end{itemize}
 \item [Temperature] Sets the temperature at which the system will run.
 	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - The distance to truncate the Lennard-Jones potential at.
+	\item Value 1: $<DOUBLE>$ - Constant temperature of simulation in degrees Kelvin.
 	\end{itemize}
+\item [Rcut] Sets a specific radius that non-bonded interaction energy and force will be considered and calculated using defined potential function.
+	\begin{itemize}
+	\item Value 1: $<DOUBLE>$ - The distance to truncate the Lennard-Jones potential at.
+	\end{itemize}	
 \item [RcutLow] Sets a specific minimum possible in angstrom that reject any move that place any atom closer than specified distance.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - The minimum possible distance between any atoms.
@@ -947,7 +949,8 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 		\item [1-3] All interaction pairs of bonded atoms, except the ones that separated with one or two bonds, will be considered and modified using 1-4 parameters defined in parameter file.
 		\item [1-4] All interaction pairs of bonded atoms, except the ones that separated with one, two or three bonds, will be considered using non-bonded parameters defined in parameter file.
 		\end{description}
-		\colorbox{yellow}{\texttt{NOTE:}} The default value is ``1-3".
+		\colorbox{yellow}{\texttt{NOTE:}} The default value is ``1-4".\\
+		\colorbox{yellow}{\texttt{NOTE:}} In CHARMM force field, the 1-4 interaction needs to be considered. Choosing ``Exclude 1-3'' will modify 1-4 interaction based on 1-4 parameter in parameter file. If a kind force field is used, where 1-4 interaction needs to be ignored, such as TraPPE, either ``exclude 1-4'' needs to be chosen or 1-4 parameter needs to be assigned a value of zero in the parameter file.
 	\end{itemize}
 \item [Potential] Defines the potential function type to calculate non-bonded interaction energy and force between atoms.
 	\begin{itemize}
@@ -959,7 +962,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{\# SIMULATION CONDITION}\\
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{Temperature 200.00}\\
+		\texttt{Temperature 270.00}\\
 		\texttt{Potential VDW}\\
 		\texttt{LRC true}\\
 		\texttt{Rcut 10}\\
@@ -971,7 +974,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{\# SIMULATION CONDITION}\\
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{Temperature 200.00}\\
+		\texttt{Temperature 270.00}\\
 		\texttt{Potential SHIFT}\\
 		\texttt{LRC false}\\
 		\texttt{Rcut 10}\\
@@ -984,7 +987,6 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - Define switch distance in angstrom. If the ``SWITCH'' function is chosen, \texttt{Rswitch} needs to be defined; otherwise, the program will be terminated. 
 	\end{itemize}
-\colorbox{yellow}{\texttt{NOTE:}} In CHARMM force field, the 1-4 interaction needs to be considered. Choosing ``Exclude 1-3'' will modify 1-4 interaction based on 1-4 parameter in parameter file. If a kind force field is used, where 1-4 interaction needs to be ignored, such as TraPPE, either ``exclude 1-4'' needs to be chosen or 1-4 parameter needs to be assigned a value of zero in the parameter file.
 \item [ElectroStatic] Considers coulomb interaction or not. This function will be discussed further in the Intermolecular energy and Virial calculation section.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - True if coulomb interaction needs to be considered and false if not.
@@ -1015,11 +1017,11 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<BOOLEAN>$ - ``True'' enabling pressure calculation during the simulation, ``false'' disabling pressure calculation.
 	\item Value 2: $<ULONG>$ - The frequency of calculating the pressure.
 	\end{itemize}
-\item [1-4scaling] Defines constant factor to modify 1-4 short range coulomb interaction.
+\item [1-4scaling] Defines constant factor to modify 1-4 intra-molecule coulomb interaction.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - A fraction number between 0.0 and 1.0 that sets 1-4 scaling factor.
 	\end{itemize}
-	\colorbox{yellow}{\texttt{NOTE:}} \texttt{CHARMM} force field uses a value between 0.0 and 1.0. In \texttt{EXOTIC} force field, it needs to be set to 0.0 because 1-4 interaction will not be considered in this force field. In \texttt{MARTINI} force field, it needs to be set to 1.0 because 1-4 interaction will not be modified in this force field.\\
+	\colorbox{yellow}{\texttt{NOTE:}} \texttt{CHARMM} force field uses a value between 0.0 and 1.0. In \texttt{MARTINI} force field, it needs to be set to 1.0 because 1-4 interaction will not be modified in this force field.\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1056,13 +1058,30 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<STRING>$ - The resname to apply this chemical potential w.r.t.
 	\item Value 2: $<DOUBLE>$ - The chemical potential value in degrees Kelvin (should be negative).
 	\end{itemize}
-	\colorbox{yellow}{\texttt{NOTE:}} For binay systems, include multiple copies of the tag (one per residue kind).\\
+	\colorbox{yellow}{\texttt{NOTE:}} For binary systems, include multiple copies of the tag (one per residue kind).\\
+	\colorbox{yellow}{\texttt{NOTE:}} If there is a molecule kind that cannot be transfer between boxes (in PDB file the beta value is set to 1.00 or 2.00), an arbitrary value (e.g. 0.00) can be assigned to the resname.\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{\#  Mol. Name    Chem. Pot. (K)}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{ChemPot        AR               -968}\\
+	\end{tabular}}
+\item [Fugacity] (\colorbox{cyan}{For Grand Canonical (GC) ensemble runs only}): Fugacity at which simulation is run.
+	\begin{itemize}
+	\item Value 1: $<STRING>$ - The resname to apply this fugacity w.r.t.
+	\item Value 2: $<DOUBLE>$ - The fugacity value in bar.
+	\end{itemize}
+	\colorbox{yellow}{\texttt{NOTE:}} For binary systems, include multiple copies of the tag (one per residue kind).\\
+	\colorbox{yellow}{\texttt{NOTE:}} If there is a molecule kind that cannot be transfer between boxes (in PDB file the beta value is set to 1.00 or 2.00) an arbitrary value e.g. 0.00 can be assigned to the resname.\\
+	\colorbox{lightgray}{
+	\begin{tabular}{l}
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
+	\texttt{\#  Mol. Name    Fugacity (bar)}\\
+	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
+	\texttt{Fugacity        AR               0.1}\\
+	\texttt{Fugacity        Si                0.0}\\
+  	\texttt{Fugacity        O                0.0}\\
 	\end{tabular}}
 \item [DisFreq] Fractional percentage at which displacement move will occur.
 	\begin{itemize}
@@ -1096,11 +1115,18 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\texttt{IntraSwapFreq   0.10}\\
 	\end{tabular}}\\\\
 	\colorbox{yellow}{\texttt{NOTE:}} All move percentages should add up to 1.0; otherwise, the program will terminate.
+	
 \item [useConstantArea] (\colorbox{cyan}{For Isobaric-Isothermal ensemble and Gibbs ensemble runs only}) Considers to change the volume of the simulation box by fixing the cross-sectional area (x-y plane).
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - If ``true'' volume will change only in z axis, If ``false'' volume will change with constant axis ratio.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} By default, \texttt{useConstantArea} will be set to ``false'' if no value was set. It means, the volume of the box will change in a way to maintain the constant axis ratio.
+	
+\item [FixVolBox0] (\colorbox{cyan}{For adsorption simulation in 'NPT Gibbs ensemble runs only}) Changing the volume of fluid phase (Box 1) to maintain the constant imposed pressure  and temperature, while keeping the volume of adsorbed phase (Box 0) fix.
+	\begin{itemize}
+	\item Value 1: $<BOOLEAN>$ - If ``true'' volume of adsorbed phase will remain constant, If ``false'' volume of adsorbed phase will change.
+	\end{itemize}
+
 \item [BoxDim] Defines the axis lengths of simulation box. This tag may occur multiple times.  It occurs once for \texttt{NVT} and \texttt{NPT}, but twice for Gibbs ensemble or GC ensemble.
 	\begin{itemize}
 	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0')
@@ -1126,6 +1152,9 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\texttt{BoxDim 0 106.00 106.00 106.00}\\
 	\texttt{BoxDim 1 176.00 176.00 176.00}\\
 	\end{tabular}}
+	
+	\colorbox{red}{\texttt{Warning:}} In case of \texttt{Restart   true}, box dimension must be manually entered. The box dimension can be find from the first line of restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb and OutputName\_BOX\_1\_restart.pdb). \\
+	
 \item [CBMC\_First] Number of CBMC trials to choose the first seed position (Lennard-Jones trials for first seed growth)
 	\begin{itemize}
 	\item Value 1: $<INTEGER>$ - Number of initial insertion sites to try
@@ -1167,19 +1196,19 @@ This section contains all the values that control output in the control file.  F
 	\texttt{OutputName  ISB\_T\_270\_K}\\
 	\end{tabular}}
 	\end{itemize}
-\item [CoordinatesFreq] Controls output of PDB file (coordinates). If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
+\item [CoordinatesFreq] Controls output of PDB file (coordinates). If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped into OutputName\_BOX\_\texttt{n}.pdb, where \texttt{n} defines the box number.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables dumping these files; ``false'' disables dumping.
 	\item Value 2: $<ULONG>$ - Steps per dump PDB frame. It should be less than or equal to RunSteps. If this keyword could not be found in configuration file, its value will be assigned a default value to dump 10 frames.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} The PDB file contains an entry for every ATOM, in all boxes read. This allows VMD (which requires a constant number of atoms) to properly parse frames, with a bit of help. Atoms that are not currently in a specific box are given the coordinate (0.00, 0.00, 0.00). The occupancy value corresponds to the box a molecule is currently in (e.g. 0.00 for box 0; 1.00 for box 1).\\\\
-	\colorbox{yellow}{\texttt{NOTE:}} At the beginning of simulation, a merged PSF file contain  ``\_merged'' phrase, in which all boxes will be dumped. It also contains the topology for every molecule in both boxes, corresponding to the merged PDB format. Loading PDB files into merged PSF file in VMD allows the user to visualize and analyze the results.
-\item [RestartFreq] Controls the output of the last state of simulation at a specified step in PDB files (coordinates) that contain ``\_restart'' phrase. If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
+	\colorbox{yellow}{\texttt{NOTE:}} At the beginning of simulation, a merged PSF file will be dumped into OutputName\_merged.pdb, in which all boxes will be dumped. It also contains the topology for every molecule in both boxes, corresponding to the merged PDB format. Loading PDB files into merged PSF file in VMD allows the user to visualize and analyze the results. In addition, this file can be used to load into GOMC once restart simulation was active.
+\item [RestartFreq] Controls the output of the last state of simulation at a specified step in PDB files (coordinates) OutputName\_BOX\_\texttt{n}\_restart.pdb, where \texttt{n} defines the box number. If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables dumping these files; ``false'' disables dumping.
 	\item Value 2: $<ULONG>$ - Steps per dump last state of simulation to PDB files. It should be less than or equal to \texttt{RunSteps}. If this keyword could not be found in the configuration file, \texttt{RestartFreq} value will be assigned by default.
 	\end{itemize}
-	\colorbox{yellow}{\texttt{NOTE:}} The restart PDB file contains only \texttt{ATOM} that exist in each boxes at specified steps. This allows the user to use psfgen and tcl to build a new PSF file and reload it to \texttt{RESTART} the simulation.\\
+	\colorbox{yellow}{\texttt{NOTE:}} The restart PDB file contains only \texttt{ATOM} that exist in each boxes at specified steps. This allows the user to load this file into GOMC once restart simulation was active.\\
 	\colorbox{yellow}{\texttt{NOTE:}} \texttt{CoordinatesFreq} must be a common multiple of \texttt{RestartFreq} or vice versa.
 \item [ConsoleFreq] Controls the output to STDIO (``the console'') of messages such as acceptance statistics, and run timing info. In addition, instantaneously-selected thermodynamic properties will be output to this file.
 	\begin{itemize}
@@ -1286,6 +1315,7 @@ Heat of vaporization & KJ/mol & Surface Tension & mN/m \\
 \end{tabular}}
 \subsection{Console Output}
 A variety of useful information relating to instantaneous statistical and thermodynamic data (move trials, acceptance rates, file I/O messages warnings, and other kinds of information) is printed to the \texttt{STDIO}, which, in Linux, will typically be displayed in the terminal.  This output can be redirected into a log file in Linux using the '' $>$ '' operator.\\\\
+\texttt{\$ GOMC\_CPU\_NVT   in.conf   $>$   out\_isobutane.log \&}\\\\
 Statistical and thermodynamic information is provided in console output.\\
 \begin{itemize}
 \item Energy
@@ -1315,47 +1345,36 @@ In order to extract the desired information from the console file, ``grep'' and 
 \colorbox{lightgray}{
 \texttt{grep ``ENER\_0''   output\_console.log | awk '\{{print \$3}\}'}
 }\\\\
-Here, ``output\_console.log'' is the console output file and ``\$3'' represents the second element of the ``ENERGY\_BOX\_0'' section.
-The first section of this console output typically includes some info relating to the system, CPU, and RAM. In continue, console output includes information regarding the input file (configuration file) reading, force field reading, summary of the topology of the molecule, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)\\\\
-\textit{\colorbox{yellow}{NOTE}: Surface Tension is calculated using Virial method according to following equation,}
+Here, ``output\_console.log'' is the console output file and ``\$3'' represents the second element of the ``ENERGY\_BOX\_0'' section.\\
+
+\colorbox{yellow}{NOTE}: \textit{Surface Tension is calculated using Virial method according to following equation,}
 \begin{equation}
 	\gamma = \frac{1}{2A_{xy}} \int_{0}^{L} \bigg(P_{zz} - \frac{P_{xx} + P_{yy}}{2} \bigg) dz
 \end{equation}
 
+The first section of this console output typically includes some information relating the system, CPU, GPU, and RAM. In continue, console output includes information regarding the input file (configuration file), force field reading, summary of the structure of the molecule, bonded parameter, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)\\\\
+
 \begin{figure}[H]
-\includegraphics[scale=1]{images/out1}
+\includegraphics[scale=0.7]{images/out1}
 \end{figure}
 \begin{figure}[H]
-\includegraphics[scale=1]{images/out2}
+\includegraphics[scale=0.7]{images/out2}
 \end{figure}
 \newpage
-Next, the energy title and initial energy of the system's starting configuration will print:\\
+Next, the energy and statistic title, initial energy and statistic of the system's starting configuration will print:\\
 \begin{figure}[H]
-\includegraphics[scale=1]{images/out3}
+\includegraphics[scale=0.7]{images/out3}
 \end{figure}
 After the simulation starts, move, energy, and statistical title, followed by their values for each simulation box, will print:
 \begin{figure}[H]
-\includegraphics[scale=1]{images/out4}
+\includegraphics[scale=0.7]{images/out4}
 \end{figure}
 At the end of the run, timing information and other wrap up info will be printed.\\
 \colorbox{yellow}{\texttt{NOTE:}} Printed energy and statistical values are instantaneous values.\\
+\colorbox{yellow}{\texttt{NOTE:}} In order to keep the format of console file consistent, if calculated energy of simulation is greater that 9999999999.9999, the value of 999999999 will be printed instead.\\
 \colorbox{yellow}{\texttt{NOTE:}} It's important to watch the acceptance rates and adjust the move percentages and CBMC trial amounts to get the desired rate of move acceptance.
-\subsection{PDB and PSF Files}
-The PDB and PSF output (merging of atom entries) has already been mentioned/explained in previous sections.  To recap: The PDB file's \texttt{ATOM} entries' occupancy is used to represent the box the molecule is in for the current frame. All molecules are listed in order in which they were read (i.e. if box 0 has 1..N1 molecules and box 1 has $1..N_2$ molecules, then all of the molecules in box 0 are listed first and all the molecules in box 1, i.e. $1..N_1, N_1+1..N_1+N_2$).  PDB frames are written as standard PDBs to consecutive file frames.\\\\
-To visualize, open the PDB and PSF files outpout by VMD and use the command in the terminal:\\\\
-\colorbox{lightgray}{
-\texttt{pbc join connected}
-}\\\\
-Use the TKConsole to get the current frame to obey the periodicity. Some peculiarities will still be observed, so please review the PDB file if anything looks odd (e.g. bonds will sometimes not show up in later frames). The GOMC team is in the process of improving VMD compatibility, but this may require changes to VMD to allow the files output to be read properly.\\\\
-For Gibbs ensemble, the same PSF will be used to visualize either box, i.e.\\
-\colorbox{lightgray}{
-\texttt{vmd ISB\_T\_330.00\_K\_Run\_0\_MIE\_BOX\_0.pdb ISB\_T\_330.00\_K\_Run\_0\_MIE\_merged.pdb}
-}\\\\
-... for visualizing the first box and...\\
-\colorbox{lightgray}{
-\texttt{vmd ISB\_T\_330.00\_K\_Run\_0\_MIE\_BOX\_1.pdb ISB\_T\_330.00\_K\_Run\_0\_MIE\_merged.pdb}
-}\\\\
-... for visualizing the second box.
+
+%Blockoutput section
 \subsection{Block Output Files}
 GOMC tracks a number of thermodynamic variables of interest during the simulation and prints them all in one file for each box.
 \begin{itemize}
@@ -1380,11 +1399,37 @@ GOMC tracks a number of thermodynamic variables of interest during the simulatio
 \end{itemize}
 At the beginning of each file, the title of each property followed by their average values is printed. Desired data can be extracted, as explained before, using the ``awk'' command. For example, in order to extract total density of the system, the following command need to be executed in terminal:\\\\
 \colorbox{lightgray}{
-\texttt{cat Blk\_OUTPUTNAME\_BOX\_0.dat | awk `\{{print \$13}\}'}
+\texttt{cat Blk\_OutputName\_BOX\_0.dat | awk `\{{print \$13}\}'}
 }\\\\
-Here, ``Blk\_OUTPUTNAME\_BOX\_0.dat'' is the block-average file for simulation box 0 and ``\$13'' represents the 13th column of the block file.
-\newpage
+Here, ``Blk\_OutputName\_BOX\_0.dat'' is the block-average file for simulation box 0 and ``\$13'' represents the 13th column of the block file.\\
 
+\colorbox{yellow}{\texttt{NOTE:}} In order to keep the format of Blockaverage file consistent, if calculated energy of simulation is greater that 9999999999.9999, the value of 999999999 will be printed instead.\\
+
+%Visualizing
+\subsection{Visualizing Simulation}
+If \texttt{CoordinatesFreq} is enabled in configuration file, GOMC will output the molecule coordinates every specified stpes.
+The PDB and PSF output (merging of atom entries) has already been mentioned/explained in previous sections.  To recap: The PDB file's \texttt{ATOM} entries' occupancy is used to represent the box the molecule is in for the current frame. All molecules are listed in order in which they were read (i.e. if box 0 has 1..N1 molecules and box 1 has $1..N_2$ molecules, then all of the molecules in box 0 are listed first and all the molecules in box 1, i.e. $1..N_1, N_1+1..N_1+N_2$).  PDB frames are written as standard PDBs to consecutive file frames.\\\\
+To visualize, open the output PDB and PSF files by GOMC using VMD,  type this command in the terminal:\\\\
+For all simulation except Gibbs ensemble that has one simulation box:\\\\
+\colorbox{lightgray}{
+\texttt{\$ vmd ISB\_T\_270\_k\_merged.psf  ISB\_T\_270\_k\_BOX\_0.pdb}
+}\\\\
+
+For Gibbs ensemble, visualizing the first box:\\\\
+\colorbox{lightgray}{
+\texttt{\$ vmd ISB\_T\_270\_k\_merged.psf  ISB\_T\_270\_k\_BOX\_0.pdb}
+}\\\\
+For Gibbs ensemble, visualizing the second box:\\\\
+\colorbox{lightgray}{
+\texttt{\$ vmd ISB\_T\_270\_k\_merged.psf  ISB\_T\_270\_k\_BOX\_1.pdb}
+}\\\\
+
+\colorbox{yellow}{\texttt{NOTE:}} Restart coordinate file (OutputName\_BOX\_0\_restart.pdb) cannot be visualize using merged psf file, because atom number does not match. However, you can still open it in vmd using following command and vmd will automatically find the bonds of the molecule based on the coordinates.\\\\
+\colorbox{lightgray}{
+\texttt{\$ vmd  ISB\_T\_270\_k\_BOX\_0\_restart.pdb}
+}\\\\
+
+\newpage
 %RUNNING
 \section{Putting it all together: Running a GOMC Simulation}
 It is strongly recommended that you download the test system provided at\\
