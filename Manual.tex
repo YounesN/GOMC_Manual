@@ -117,20 +117,20 @@ GOMC officially supports Windows 7, 8, and most modern distributions of Linux (s
 
 GOMC has some mild software requirements, which are widely available for Linux operating systems.  Required software requirements are:\\\\
 \begin{easylist}[articletoc]
-ï¿½ C++03 Compliant Compiler
-ï¿½ï¿½ Linux/OS X
-ï¿½ icpc (Intel C++ Compiler)\\\\
+§ C++03 Compliant Compiler
+§§ Linux/OS X
+§§§ icpc (Intel C++ Compiler)\\\\
 Type the following command in a terminal: \\\\
 \texttt{\$ icpc --version} \\\\
 If gives a version number 4.4 or later, you're all set.  If it's older than 4.4 (released in 2009), we recommend upgrading. \\
 In Linux, the Intel compiler will generally produce the fastest CPU executables (when running on Intel Core processors). \\\\
-ï¿½ï¿½ï¿½ g++ (GNU GCC) \\
+§§§ g++ (GNU GCC) \\
 Type the following command in a terminal.\\\\
 \texttt{\$ g++ --version}\\\\
 If gives a version number 4.4 or later, you're all set. If it's older than 4.4 (released in 2009), we recommend upgrading.
 
-ï¿½ï¿½ Windows
-ï¿½ï¿½ï¿½ Visual Studio\\
+§§ Windows
+§§§ Visual Studio\\
 Microsoft's Visual Studio 2010 or later is recommended.\\
 To check the version:\\
 \textit{Help} (top tab) $\to$ \textit{About Microsoft Visual Studio}
@@ -143,13 +143,13 @@ To check the version:\\
 \includegraphics[scale=0.6]{images/vsabout}
 \end{figure}
 
-ï¿½ï¿½ï¿½ cmake (if compiling on Linux)\\
+§§§ cmake (if compiling on Linux)\\
 To check if cmake is installed:\\\\
 \texttt{\$ which cmake}\\\\
 To check the version number:\\\\
 \texttt{\$ cmake --version}\\
 
-ï¿½ï¿½ï¿½ nvcc/CUDA libs\\
+§§§ nvcc/CUDA libs\\
 The GPU builds of the code requires NVIDIA's CUDA 6.0 or newer:\\
 To check if nvcc is installed:\\\\
 \texttt{\$ which nvcc}\\\\
