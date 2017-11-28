@@ -50,7 +50,7 @@
 
 \begin{document}
 
-\title{\Huge User Manual\\Version 2.10}
+\title{\Huge User Manual\\Version 2.20}
 \author{\\\\\\\\\\\\\\\\\\\\\\\\\\Distributed by the Potoff and Schwiebert Groups\\\textcopyright Wayne State University}
 
 \maketitle
@@ -197,8 +197,9 @@ In-Depth Overview [PDF]\\
 Packmol is a molecule packing tool created by Jos\'e Mario Mart\'inez, a professor of mathematics at the State University of Campinas, Brazil.  It is written in Fortran and is free to download.  More information is available on their homepage:\\\\
 \url{http://www.ime.unicamp.br/~martinez/packmol}\\\\
 To compile it, a Fortran language compiler is needed, such as gfortran.  Many Linux distributions no longer come with Fortran compilers automatically, so this may need to be installed additionally.\\
-Packmol allows a specified number of molecules to be packed at defined separating distances within a certain region of space.  One of Packmol?s limitations is that it is unaware of topology; it treats each molecule or group of molecules as a rigid set of points.\\\\
-\textit{\colorbox{red}{WARNING}: Another more serious limitation is that it is not aware of periodic boundary conditions (PBC).  As a result, when using Packmol to pack PDBs for GOMC, it is recommended to pack to a box 1 Angstroms smaller than the simulation box size.  This prevents hard overlaps over the periodic boundary.}
+Packmol allows a specified number of molecules to be packed at defined separating distances within a certain region of space.  One of Packmol's limitations is that it is unaware of topology; it treats each molecule or group of molecules as a rigid set of points.\\\\
+\textit{\colorbox{red}{WARNING}}: Another more serious limitation is that it is not aware of periodic boundary conditions (PBC).  As a result, when using Packmol to pack PDBs for GOMC, it is recommended to pack to a box 1 Angstroms smaller than the simulation box size.  This prevents hard overlaps over the periodic boundary.\\\\
+\textit{\colorbox{red}{WARNING}}: If full simulation box size was used to pack the molecules, the chance of having overlap due to applying periodic boundary condition is high. If total energy of simulation become greater that $1.0 e^{14}$, \texttt{System Total Energy Calculation} will be performed at \texttt{EqSteps} to preserve energy value.\\
 
 \newpage
 %COMLILING
@@ -612,7 +613,7 @@ As seen above, the following are recognized, read and used:
 
 \item \texttt{NBFIX}
 \begin{itemize}
-\item This tag name only should be used if \texttt{CHARMM} force field is being used. This section allows interaction between two pairs of atoms to be modified, done by specifying two atom type names followed by minimum energy and minimum radius. In order to modify 1-4 interaction, a second minimum energy and minimum radius need to be defined; otherwise, the same parameter will be considered for 1-4 interaction.\\
+\item This tag name only should be used if \texttt{CHARMM} force field is being used. This section allows interaction between two pairs of atoms to be modified, done by specifying two atom type names followed by minimum energy and minimum radius. In order to modify 1-4 interaction, a second minimum energy and minimum radius need to be defined; otherwise, the same parameter will be considered for 1-4 interaction.\\\\
 \colorbox{yellow}{\texttt{NOTE:}} Please pay attention that in this section we define minimum radius, not (minimum radius)/2 as it is defined in the \texttt{NONBONDED} section.
 \end{itemize}
 Currently, supported sections of the \texttt{CHARMM} compliant file include \texttt{BONDS}, \texttt{ANGLES}, \texttt{DIHEDRALS}, \texttt{NONBONDED}, \texttt{NBFIX}. Other sections such as \texttt{CMAP} are not currently read or supported.\\
@@ -653,7 +654,8 @@ Here is an example of what is necessary for isobutane:\\
 \texttt{!atom types         Ktheta       Theta0   Kub(?)  S0(?)}\\
 \texttt{CH3 CH1 CH3         62.100125    112.00 ! TraPPE 2}\\
 \end{tabular}}\\\\
-Some CHARMM \texttt{ANGLES} section entries include Urey-Bradley potentials (\texttt{$K_{ub}$}, \texttt{$b_{ub}$}), in addition to the standard quadratic angle potential. The constants related to this potential function are currently read, but the logic has not been added to calculate this potential function. Support for this potential function will be added in later versions of the code.\\\\
+Some CHARMM \texttt{ANGLES} section entries include Urey-Bradley potentials (\texttt{$K_{ub}$}, \texttt{$b_{ub}$}), in addition to the standard quadratic angle potential. The constants related to this potential function are currently read, but the logic has not been added to calculate this potential function. Support for this potential function will be added in later versions of the code.\\
+\subsubsection{DIHEDRALS}
 The final major bonded interactions section of the \texttt{CHARMM} compliant parameter file are the \texttt{DIHEDRALS}. Each dihedral is composed of a dihedral series of 1 or more terms. Often, there are 4 to 6 terms in a dihedral. Angles for the dihedrals' deltas are given in degrees.\\
 Since isobutane has no dihedral, here are the parameters pertaining to 2,3-dimethylbutane:\\\\
 \colorbox{lightgray}{
@@ -677,6 +679,8 @@ Since isobutane has no dihedral, here are the parameters pertaining to 2,3-dimet
 \colorbox{yellow}{\texttt{NOTE:}} The code allows the use of `X' to indicate ambiguous positions on the ends. This is useful because this kind is often determined solely by the two middle atoms in the middle of the dihedral, according to literature.
 \subsubsection{IMPROPERS}
 Energy parameters used to describe out-of-plane rocking are currently read, but unused. The section is often blank. If it becomes necessary, algorithms to calculate the improper energy will need to be added.\\
+
+\subsubsection{NONBONDED}
 The next section of the \texttt{CHARMM} style parameter file is the \texttt{NONBONDED}. In order to use \texttt{TraPPE} this section of the \texttt{CHARMM} compliant file is critical. Here's an example with our isobutane potential model:\\\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -691,7 +695,9 @@ The next section of the \texttt{CHARMM} style parameter file is the \texttt{NONB
 \texttt{End}\\
 \end{tabular}}\\\\
 \colorbox{yellow}{\texttt{NOTE:}} The \texttt{$R_{min}$} is different from \texttt{$\sigma$}. \texttt{$\sigma$} is the distance to the x-intercept (where interaction energy goes from being repulsive to positive). \texttt{$R_{min}$} is the potential well-depth, where the attraction is maximum. To convert \texttt{$\sigma$} to \texttt{$R_{min}$}, simply multiply \texttt{$\sigma$} by 0.56123102415, and flag it with a negative sign.\\
-The last section of the \texttt{CHARMM} style parameter file is the \texttt{NBFIX}. In this section, individual pair interaction will be modified. First, pseudo non-bonded parameters have to be defined in \texttt{NONBONDED} and modified in \texttt{NBFIX}. Here?s an example if it is required to modify interaction between \texttt{CH3} and \texttt{CH1} atoms:\\
+
+\subsubsection{NBFIX}
+The last section of the \texttt{CHARMM} style parameter file is the \texttt{NBFIX}. In this section, individual pair interaction will be modified. First, pseudo non-bonded parameters have to be defined in \texttt{NONBONDED} and modified in \texttt{NBFIX}. Here?s an example if it is required to modify interaction between \texttt{CH3} and \texttt{CH1} atoms:\\\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
 \texttt{NBFIX }\\
@@ -702,6 +708,7 @@ The last section of the \texttt{CHARMM} style parameter file is the \texttt{NBFI
 \texttt{End}\\
 \end{tabular}}\\\\
 
+\newpage
 \subsection{Exotic Parameter file}
 The exotic file is intended for use with nonstandard/specialty models of molecular interaction, which are not included in \texttt{CHARMM} standard. Currently, two custom interaction are included:
 \begin{description}
@@ -735,7 +742,7 @@ The control file is GOMC's proprietary input file. It contains key settings. The
 \subsubsection{Input/Simulation Setup}
 In this section, input file names are listed. In addition, if you want to restart your simulation or use integer seed for running your simulation, you need to modify this section according to your purpose.
 \begin{description}
-\item [Restart] Determines whether to restart and, if so, what step to restart from.\\
+\item [Restart] Determines whether to restart the simulation from previous simulation or not.\\
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - true if restart, false otherwise\\
 	\end{itemize}
@@ -757,7 +764,7 @@ In this section, input file names are listed. In addition, if you want to restar
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{\# kind \{RANDOM, INTSEED\}}\\
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{PRNG RESTART}\\
+		\texttt{PRNG INTSEED}\\
 		\end{tabular}}
 		\end{itemize}
 	\end{itemize}
@@ -841,8 +848,8 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{Coordinates 1 STEP3\_START\_ISB\_sys\_BOX\_1.pdb}\\
 	\end{tabular}}
 	
-	\colorbox{yellow}{\texttt{NOTE:}} In case of \texttt{Restart   true}, the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb) can be used for both boxes. \\\\
-	Example of Gibbs ensemble when Restart mode is active\\
+	\colorbox{yellow}{\texttt{NOTE:}} In case of \texttt{Restart   true}, the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb) can be used for each boxe. \\\\
+	Example of Gibbs ensemble when \texttt{Restart} mode is active\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1053,7 +1060,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\end{itemize}
 \item [ChemPot] (\colorbox{cyan}{For Grand Canonical (GC) ensemble runs only}): Chemical potential at which simulation is run.
 	\begin{itemize}
-	\item Value 1: $<STRING>$ - The resname to apply this chemical potential w.r.t.
+	\item Value 1: $<STRING>$ - The resname to apply this chemical potential.
 	\item Value 2: $<DOUBLE>$ - The chemical potential value in degrees Kelvin (should be negative).
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} For binary systems, include multiple copies of the tag (one per residue kind).\\
@@ -1067,7 +1074,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\end{tabular}}
 \item [Fugacity] (\colorbox{cyan}{For Grand Canonical (GC) ensemble runs only}): Fugacity at which simulation is run.
 	\begin{itemize}
-	\item Value 1: $<STRING>$ - The resname to apply this fugacity w.r.t.
+	\item Value 1: $<STRING>$ - The resname to apply this fugacity.
 	\item Value 2: $<DOUBLE>$ - The fugacity value in bar.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} For binary systems, include multiple copies of the tag (one per residue kind).\\
@@ -1125,33 +1132,39 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<BOOLEAN>$ - If ``true'' volume of adsorbed phase will remain constant, If ``false'' volume of adsorbed phase will change.
 	\end{itemize}
 
-\item [BoxDim] Defines the axis lengths of simulation box. This tag may occur multiple times.  It occurs once for \texttt{NVT} and \texttt{NPT}, but twice for Gibbs ensemble or GC ensemble.
+\item [CellBasisVector] Defines the shape and size of the simulation periodic cell. \texttt{CellBasisVector1}, \texttt{CellBasisVector2}, \texttt{CellBasisVector3} represent the cell basis vector $a, b, c$, respectively. This tag may occur multiple times.  It occurs once for \texttt{NVT} and \texttt{NPT}, but twice for Gibbs ensemble or GC ensemble.
 	\begin{itemize}
 	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0')
-	\item Value 2: $<DOUBLE>$ - x-axis length in Angstroms
-	\item Value 3: $<DOUBLE>$ – y-axis length in Angstroms
-	\item Value 4: $<DOUBLE>$ - z-axis length in Angstroms
+	\item Value 2: $<DOUBLE>$ - x value of cell basis vector in Angstroms
+	\item Value 3: $<DOUBLE>$ - y value of cell basis vector in Angstroms
+	\item Value 4: $<DOUBLE>$ - z value of cell basis vector in Angstroms
 	\end{itemize}
-	\colorbox{yellow}{\texttt{NOTE:}} If the number of defined boxes were not compatible to simulation type, the program will be terminated.\\
-	Example for \texttt{NVT} and \texttt{NPT} ensemble:\\
+	\colorbox{yellow}{\texttt{NOTE:}} If the number of defined boxes were not compatible to simulation type, the program will be terminated.\\\\
+	Example for \texttt{NVT} and \texttt{NPT} ensemble. In this example, each vector is perpendicular to the other two ($\alpha = 90, \beta = 90, \gamma = 90$), as indicated by a single x, y, or z value being specified by each and making a rectangular 3-D box:\\\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{\#  BOX DIMENSION \#, X, Y, Z}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{BoxDim 0 40.00 40.00 40.00}\\
+	\texttt{CellBasisVector1 0  40.00 00.00 00.00}\\
+	\texttt{CellBasisVector2 0    00.00 40.00  00.00}\\
+	\texttt{CellBasisVector3 0    00.00 00.00  80.00}\\
 	\end{tabular}}\\\\
-	Example for \texttt{Gibbs ensemble} and \texttt{GC ensemble} ensemble:\\
+	Example for \texttt{Gibbs ensemble} and \texttt{GC ensemble} ensemble. In this example,  In the first box, only vector $a$ and $c$ are perpendicular to each other ($\alpha = 90, \beta = 90, \gamma = 120$), and making a non-orthogonal simulation cell with the cell length a, b, c of 36.91, 39.91, and 76.98 Angstroms, respectively. In the second box, each vector is perpendicular to the other two ($\alpha = 90, \beta = 90, \gamma = 90$), as indicated by a single x, y, or z value being specified by each and making a cubic box:\\\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{\#  BOX DIMENSION \#, X, Y, Z}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{BoxDim 0 106.00 106.00 106.00}\\
-	\texttt{BoxDim 1 176.00 176.00 176.00}\\
+	\texttt{CellBasisVector1 0  36.91  00.00  00.00}\\
+	\texttt{CellBasisVector2 0   -18.45 31.96   00.00}\\
+	\texttt{CellBasisVector3 0   00.00 00.00  76.98}\\\\
+	\texttt{CellBasisVector1 1  60.00 00.00 00.00}\\
+	\texttt{CellBasisVector2 1    00.00 60.00  00.00}\\
+	\texttt{CellBasisVector3 1    00.00 00.00  60.00}\\
 	\end{tabular}}
 	
-	\colorbox{red}{\texttt{Warning:}} In case of \texttt{Restart   true}, box dimension must be manually entered. The box dimension can be find from the first line of restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb and OutputName\_BOX\_1\_restart.pdb). \\
+	\colorbox{red}{\texttt{Warning:}} In case of \texttt{Restart   true}, box dimension does not need to be specified. If it is specified, program will read it but it will be ignored and replaced by the printed cell dimensions and angles in the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb and OutputName\_BOX\_1\_restart.pdb). \\
 	
 \item [CBMC\_First] Number of CBMC trials to choose the first seed position (Lennard-Jones trials for first seed growth)
 	\begin{itemize}
@@ -1201,7 +1214,13 @@ This section contains all the values that control output in the control file.  F
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} The PDB file contains an entry for every ATOM, in all boxes read. This allows VMD (which requires a constant number of atoms) to properly parse frames, with a bit of help. Atoms that are not currently in a specific box are given the coordinate (0.00, 0.00, 0.00). The occupancy value corresponds to the box a molecule is currently in (e.g. 0.00 for box 0; 1.00 for box 1).\\\\
 	\colorbox{yellow}{\texttt{NOTE:}} At the beginning of simulation, a merged PSF file will be dumped into OutputName\_merged.pdb, in which all boxes will be dumped. It also contains the topology for every molecule in both boxes, corresponding to the merged PDB format. Loading PDB files into merged PSF file in VMD allows the user to visualize and analyze the results. In addition, this file can be used to load into GOMC once restart simulation was active.
-\item [RestartFreq] Controls the output of the last state of simulation at a specified step in PDB files (coordinates) OutputName\_BOX\_\texttt{n}\_restart.pdb, where \texttt{n} defines the box number. If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
+\item [RestartFreq] Controls the output of the last state of simulation at a specified step in PDB files (coordinates) OutputName\_BOX\_\texttt{n}\_restart.pdb, where \texttt{n} defines the box number. Header part of this file contains important information and will be needed to restart the simulation:
+\begin{itemize}
+	\item Simulation cell dimensions and angles.
+	\item Maximum amount of displacement ($\AA$), rotation ($\theta$), and volume ($\AA^3$) that used in \texttt{Displacement}, \texttt{Rotation}, and \texttt{Volume} move. 
+	\end{itemize}
+
+If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ensemble or GC ensemble will be dumped.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables dumping these files; ``false'' disables dumping.
 	\item Value 2: $<ULONG>$ - Steps per dump last state of simulation to PDB files. It should be less than or equal to \texttt{RunSteps}. If this keyword could not be found in the configuration file, \texttt{RestartFreq} value will be assigned by default.
@@ -1360,6 +1379,7 @@ The first section of this console output typically includes some information rel
 \end{figure}
 \newpage
 Next, the energy and statistic title, initial energy and statistic of the system's starting configuration will print:\\
+\colorbox{yellow}{\texttt{NOTE:}} If total energy of simulation is greater that $1.0 e^{14}$, \texttt{System Total Energy Calculation} will be performed at \texttt{EqSteps} to preserve energy value.
 \begin{figure}[H]
 \includegraphics[scale=0.7]{images/out3}
 \end{figure}
@@ -1367,9 +1387,10 @@ After the simulation starts, move, energy, and statistical title, followed by th
 \begin{figure}[H]
 \includegraphics[scale=0.7]{images/out4}
 \end{figure}
-At the end of the run, timing information and other wrap up info will be printed.\\
+At the end of the run, timing information and other wrap up info will be printed.\\\\
 \colorbox{yellow}{\texttt{NOTE:}} Printed energy and statistical values are instantaneous values.\\
-\colorbox{yellow}{\texttt{NOTE:}} In order to keep the format of console file consistent, if calculated energy of simulation is greater that 9999999999.9999, the value of 999999999 will be printed instead.\\
+\colorbox{yellow}{\texttt{NOTE:}} In order to keep the format of console file consistent, if absolute value of calculated properties of simulation is greater that $1.0 e^{11}$, the value of 999999999 will be printed instead.\\
+\colorbox{yellow}{\texttt{NOTE:}} Since mol fraction value is very small compare to other properties, 8 digit precision was used instead of 4 digit to print out the value.\\
 \colorbox{yellow}{\texttt{NOTE:}} It's important to watch the acceptance rates and adjust the move percentages and CBMC trial amounts to get the desired rate of move acceptance.
 
 %Blockoutput section
@@ -1401,7 +1422,8 @@ At the beginning of each file, the title of each property followed by their aver
 }\\\\
 Here, ``Blk\_OutputName\_BOX\_0.dat'' is the block-average file for simulation box 0 and ``\$13'' represents the 13th column of the block file.\\
 
-\colorbox{yellow}{\texttt{NOTE:}} In order to keep the format of Blockaverage file consistent, if calculated energy of simulation is greater that 9999999999.9999, the value of 999999999 will be printed instead.\\
+\colorbox{yellow}{\texttt{NOTE:}} In order to keep the format of console file consistent, if absolute value of calculated properties of simulation is greater that $1.0 e^{11}$, the value of 999999999 will be printed instead.\\
+\colorbox{yellow}{\texttt{NOTE:}} Since mol fraction value is very small compare to other properties, 8 digit precision was used instead of 4 digit to print out the value.\\
 
 %Visualizing
 \subsection{Visualizing Simulation}
