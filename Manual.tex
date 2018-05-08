@@ -303,40 +303,46 @@ In order to run simulation in GOMC, the following files need to be provided:
 \end{itemize}
 
 \subsection{PDB File}
+GOMC requires only one PDB file for NVT and NPT ensembles. However, GOMC requires two PDB files for GEMC and GCMC ensembles.
+\subsubsection{What is PDB file}
 The term PDB can refer to the Protein Data Bank (\url{http://www.rcsb.org/pdb/}), to a data file provided there, or to any file following the PDB format. Files in the PDB include various information such as the name of the compound, the ATOM and HETATM records containing the coordinates of the molecules, and etc. PDB widely used by NAMD, GROMACS, CHARMM, ACEMD, and Amber. GOMC ignore everything in a PDB file except for the \texttt{REMARK},  \texttt{CRYST1},  \texttt{ATOM}, and  \texttt{END} records. An overview of the PDB standard can be found here:\\\\
 \url{http://www.wwpdb.org/documentation/file-format-content/format33/sect2.html#HEADER}\\
 \url{http://www.wwpdb.org/documentation/file-format-content/format33/sect8.html#CRYST1}\\
 \url{http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM}\\
 
  
-PDB contains 3 major parts; \texttt{REMARK},  \texttt{CRYST1},  and \texttt{ATOM}. Here is the definition of each field and how GOMC is using them to get the information it requires.
+PDB contains foure major parts; \texttt{REMARK}, \texttt{CRYST1}, \texttt{ATOM}, and \texttt{END}. Here is the definition of each field and how GOMC is using them to get the information it requires.
 \begin{itemize}
 \item \texttt{REMARK}: This header records present experimental details, annotations, comments, and information not included in other records (\url{http://www.wwpdb.org/documentation/file-format-content/format33/sect2.html#HEADER}). However, GOMC uses this header to print simulation informations.
-	\subitem{Max Displacement} ($\AA$)
-	\subitem{Max Rotation} (Degree)
-	\subitem{Max volume exchange} ($\AA^3$)
-	\subitem{Monte Carlo Steps} (MC)
+	\subitem \textbf{Max Displacement} ($\AA$)
+	\subitem \textbf{Max Rotation} (Degree)
+	\subitem \textbf{Max volume exchange} ($\AA^3$)
+	\subitem \textbf{Monte Carlo Steps} (MC)
 \item \texttt{CRYST1}: This header records the unit cell dimension parameters (\url{http://www.wwpdb.org/documentation/file-format-content/format33/sect8.html#CRYST1}).
-	\subitem{Lattice constant $a, b, c$} ($\AA$)
-	\subitem{Lattice angles $\alpha , \beta,  \gamma$} (Degree)
+	\subitem \textbf{Lattice constant: $a, b, c$} ($\AA$)
+	\subitem \textbf{Lattice angles: $\alpha , \beta,  \gamma$} (Degree)
 \item \texttt{ATOM}: The ATOM records present the atomic coordinates for standard amino acids and nucleotides. They also present the occupancy and temperature factor for each atom (\url{http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM}).
-	\subitem{serial}: Atom serial number.
-	\subitem{name}: Atom name.
-	\subitem{resName}: Residue name.
-	\subitem{chainID}: Chain identifier.
-	\subitem{resSeq}: Residue sequence number.
-	\subitem{x}: Coordinates for X ($\AA$).
-	\subitem{y}: Coordinates for Y ($\AA$).
-	\subitem{z}: Coordinates for Z ($\AA$).
-	\subitem{occupancy}: GOMC uses to define which atoms belong to which box.
-	\subitem{beta}: Beta orTemperature factor. GOMC uses this value to define the mobility of the atoms.
-	\subitem{element}: Element symbol.
+	\subitem \textbf{ATOM}: Record name.
+	\subitem \textbf{serial}: Atom serial number.
+	\subitem \textbf{name}: Atom name.
+	\subitem \textbf{resName}: Residue name.
+	\subitem \textbf{chainID}: Chain identifier.
+	\subitem \textbf{resSeq}: Residue sequence number.
+	\subitem \textbf{x}: Coordinates for X ($\AA$).
+	\subitem \textbf{y}: Coordinates for Y ($\AA$).
+	\subitem \textbf{z}: Coordinates for Z ($\AA$).
+	\subitem \textbf{occupancy}: GOMC uses to define which atoms belong to which box.
+	\subitem \textbf{beta}: Beta orTemperature factor. GOMC uses this value to define the mobility of the atoms.
+	\subitem \textbf{element}: Element symbol.
+	\item \texttt{END}: A frame in the PDB file is terminated with the keyword.
 \end{itemize} 
+
+
 
 Here are the PDB output of GOMC for the first molecule of isobutane:\\
 
 \colorbox{lightgray}{
-\begin{tabular}{l *10r }
+\begin{tabular}{l *{10}{r}}
   \texttt{REMARK} & \texttt{GOMC} &  \texttt{122.790} &  \texttt{3.14159} &   \texttt{3439.817} &   \texttt{1000000} & & &  & & \\
   \texttt{CRYST1} & \texttt{35.245} & \texttt{35.245} & \texttt{35.245} & \texttt{90.00} & \texttt{90.00} & \texttt{90.00} & & &  & \\
   \texttt{ATOM} & \texttt{1} & \texttt{C1} & \texttt{ISB} & \texttt{1} & \texttt{0.911} & \texttt{-0.313} & \texttt{0.000} & \texttt{0.00} & \texttt{0.00} & \texttt{C} \\
@@ -344,30 +350,23 @@ Here are the PDB output of GOMC for the first molecule of isobutane:\\
   \texttt{ATOM} & \texttt{3} & \texttt{C3} & \texttt{ISB} & \texttt{1} & \texttt{-0.629} & \texttt{-0.313} & \texttt{0.000} & \texttt{0.00} & \texttt{0.00} & \texttt{C} \\
   \texttt{ATOM} & \texttt{4} & \texttt{C4} & \texttt{ISB} & \texttt{1} & \texttt{1.424} & \texttt{0.413} & \texttt{-1.257} & \texttt{0.00} & \texttt{0.00} & \texttt{C} \\
   \multicolumn{11}{l}{\texttt{END}} \\
-\end{tabular}
-}
+\end{tabular} 
+} \\\\
 
-The fields seen here in order from left to right are the record type, atom ID, atom name, residue name, residue ID, x, y, and z coordinates, occupancy, temperature factor (called beta), segment name
+The fields seen here in order from left to right are the record type, atom ID, atom name, residue name, residue ID, x, y, and z coordinates, occupancy, temperature factor (called beta), and segment name.\\\\
+The atom name is ``C1" and residue name is ``ISB". The PSF file (next section) contains a lookup table of atoms. These contain the atom name from the PDB and the name of the atom kind in the parameter file it corresponds to. As multiple different atom names will all correspond to the same parameter, these can be viewed ``atom aliases" of sorts.  The chain letter (in this case `A') is sometimes used when packing a number of PDBs into a single PDB file.\\
 
-%%%%% TODOOOOOOO
-
-the atom name is ``C1" and residue name is ``ISB". The PSF file (next section) contains a lookup table of atoms. These contain the atom name from the PDB and the name of the atom kind in the parameter file it corresponds to. As multiple different atom names will all correspond to the same parameter, these can be viewed ``atom aliases" of sorts.  The chain letter (in this case `A') is sometimes used when packing a number of PDBs into a single PDB file.\\
-
-A few important \colorbox{yellow}{Notes}/\colorbox{red}{Warnings} on Undocumented PDB Format Conventions:
+\colorbox{red}{Important}: NOTE on PDB Format Conventions:
 \begin{itemize}
-\item While it is explicitly stated in some other sections of the PDB file, the general convention observed by most codes is to right align when padding with white space.
-\item Some codes (including PSFGen/VMD) use the 21st unused character to add a fourth letter to the residue (molecule name). This extension is currently supported, but is unofficial and, hence, may change in the future.
 \item VMD requires a constant number of ATOMs in a multi-frame PDB (multiple records terminated by ``END" in a single file). To compensate for this, all atoms from all boxes in the system are written to the output PDBs of this code.
-\item For atoms not currently in a box, the coordinates are set to $<0.00, 0.00, 0.00>$
-\item The occupancy is commonly just set to ``1.00" and is left unused by many codes. We recycle this legacy parameter by using it to denote, in our output PDBs, the box a particle is in (box 0  occupancy=0.00 ; box 1  occupancy=1.00)
-\item \textbf{The beta value in GOMC code is used to define the mobility of the molecule. }
-	\subitem \textbf{Beta  = 0.00: molecule can move and transfer within and between boxes.}
-	\subitem \textbf{Beta = 1.00: molecule is fixed in its position.}
-	\subitem \textbf{Beta = 2.00: molecule can move within the box but cannot be transferred   between boxes.}
-\item As the x, y, and z coordinates are fixed point with only three digits of precision, the energy values you get when restarting may be mildly different, particularly for bonded interactions due to roundoff in the coordinates.  This will eventually be remedied by the implementation of a full-precision trajectory (e.g. DCD) file.
-\item The ``ISB" entry in columns 73-75 is not an official part of the PDB standard.  This is a proprietary entry called ``Segname", which has been embraced by NAMD and some other codes.
-\end{itemize}
-A frame in the PDB file is terminated with the keyword \texttt{END}.\\
+\item For atoms not currently in a box, the coordinates are set to $<0.00, 0.00, 0.00>$. The occupancy is commonly just set to ``1.00" and is left unused by many codes. We recycle this legacy parameter by using it to denote, in our output PDBs, the box a particle is in (box 0  occupancy=0.00 ; box 1  occupancy=1.00)
+\item{The beta value in GOMC code is used to define the mobility of the molecule. }
+	\subitem \textbf{Beta  = 0.00}: molecule can move and transfer within and between boxes.
+	\subitem \textbf{Beta = 1.00}: molecule is fixed in its position.
+	\subitem \textbf{Beta = 2.00}: molecule can move within the box but cannot be transferred   between boxes.
+\end{itemize} 
+
+\subsubsection{Generating PDB file}
 With that overview of the format in mind, the following steps describe how a PDB file is typically built.\\
 \begin{enumerate}
 \item A single molecule PDB is obtained. In this example, the QM software package Gaussian was used to draw the molecule, which was then edited by hand to adhere to the PDB spec properly. The end result is a PDB for a single molecule:\\\\
@@ -388,7 +387,7 @@ With that overview of the format in mind, the following steps describe how a PDB
 \item Pack one box to the predicted liquid density and the other to the vapor density.
 \end{itemize}
 A good reference for getting the information needed to estimate packing is the NIST Web Book database of pure compounds:\\\\
-\url{http://webbook.nist.gov/chemistry/}\\\\
+\url{http://webbook.nist.gov/chemistry/}\\
 \item After packing is determined, a basic pack can be performed with a Packmol script.  Here is one example:\\\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -397,12 +396,12 @@ A good reference for getting the information needed to estimate packing is the N
 \texttt{output STEP2\_ISB\_packed\_BOX\_0.pdb}\\\\
 \texttt{structure isobutane.pdb}\\
 \texttt{number 1000}\\
-\texttt{inside box 0.1 0.1 0.1 70.20 70.20 70.20}\\
+\texttt{inside cube        0.1  0.1  0.1  70.20}\\
 \texttt{end structure}
 \end{tabular}
 }\\\\
-Packmol scripts are typically saved with the extension \texttt{*.inp}, so this might be named ``\texttt{pack\_isobutane.inp}".\\
-To run the script, we type the following line into the terminal:\\\\
+
+Copy the above text into``\texttt{pack\_isobutane.inp}" file, save it and run the script by typing the following line into the terminal:\\\\
 \texttt{\$ ./packmol < pack\_isobutane.inp}\\\\
 \end{enumerate}
 \subsection{PSF File}
@@ -430,7 +429,8 @@ A few important \colorbox{yellow}{Notes}/\colorbox{red}{Warnings}:
 \begin{itemize}
 \item The PSF file format is a highly redundant file format.  It repeats identical topology of thousands of molecules of a common kind in some cases. GOMC follows the same approach as NAMD, allowing this excess information externally and compiling it in the code.
 \item Other sections (e.g. cross terms) contain unsupported or legacy parameters and are ignored.
-\item Following the restrictions of VMD, the order of the PSF atoms must match the order in the PDB file.
+\item Following the restrictions of VMD, the order of the PSF atoms must match the order in the 
+.
 \item Improper entries are read and stored, but are not currently used.  Support will eventually be added for this.
 \end{itemize}
 The PSF file is typically generated using PSFGen. It is convenient to make a script, such as the example below, to do this:\\\\
