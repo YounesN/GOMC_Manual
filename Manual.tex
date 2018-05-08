@@ -518,7 +518,7 @@ Typically, one script is run per box to generate a finalized PDB/PSF for that bo
 
 %TOPOLOGY
 \subsection{Topology File}
-The topology is a whitespace separated file format, which contains a list of atoms and  their corresponding masses, and a list of residue information (charges, composition, and topology). Essentially, it is a non-redundant lookup table equivalent to the PSF file.\\\\
+A CHARMM forcefield topology file contains all of the information needed to convert a list of residue names into a complete PSF structure file. The topology is a whitespace separated file format, which contains a list of atoms and their corresponding masses, and a list of residue information (charges, composition, and topology). Essentially, it is a non-redundant lookup table equivalent to the PSF file.\\\\
 This is followed by a series of residues, which tell PSFGen what atoms are bonded to a given atom. Each residue is comprised of four key elements:
 \begin{itemize}
 \item A header beginning with the keyword RESI with the residue name and net charge
@@ -526,22 +526,10 @@ This is followed by a series of residues, which tell PSFGen what atoms are bonde
 \item A section of lines starting with the word BOND contains pairs of bonded atoms (typically 3 per line)
 \item A closing section with instructions for PSFGen.
 \end{itemize}
-Here's an example of a residue definition for isobutane:\\\\
+
+Here's an example of topology file for isobutane:\\\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
-\texttt{RESI ISB ~~ 0.00 ! isobutane - TraPPE}\\
-\texttt{GROUP}\\
-\texttt{ATOM C1 CH1    0.00 !    C3}\\
-\texttt{ATOM C2 CH3    0.00 ! C2-C1}\\
-\texttt{ATOM C3 CH3    0.00 !    C4}\\
-\texttt{ATOM C4 CH3    0.00 !}\\
-\texttt{BOND C1 C2 C1 C3 C1 C4}\\
-\texttt{PATCHING FIRS NONE LAST NONE}
-\end{tabular}}\\\\
-Here's a full parameter file prepared to pack a system of isobutane:\\\\
-\colorbox{lightgray}{
-\begin{tabular}{l}
-\texttt{*}\\
 \texttt{* Custom top file -- branched alkanes}\\
 \texttt{*}\\
 \texttt{1  1}\\
@@ -558,32 +546,17 @@ Here's a full parameter file prepared to pack a system of isobutane:\\\\
 \texttt{BOND C1 C2 C1 C3 C1 C4}\\
 \texttt{PATCHING FIRS NONE LAST NONE}\\\\
 \texttt{END}
-\end{tabular}}\\\\
+\end{tabular}} \\\\\\
 Note that the keyword \texttt{END} must be used to terminate this file and keywords related to the auto-generation process must be placed near the top of the file, after the MASS definitions.\\\\
 More in-depth information can be found in the following links:\\
-``Topology Tutorial" (PDF, in-depth)\\
-\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-tutorial.pdf}\\
-``NAMD Tutorial: 4. Examining the Topology File"\\
-\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-html/node4.html}\\
-``Developing Topology and Parameter Files"\\
-\url{http://www.ks.uiuc.edu/Training/Tutorials/science/force field-tutorial/force field-html/node6.html}\\
-``NAMD Tutorial: 25. Topology Files"\\
-\url{http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node25.html}
+\begin{itemize}
+\item{Topology Tutorial}: \url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-tutorial.pdf}
+\item{NAMD Tutorial}: Examining the Topology File (\url{http://www.ks.uiuc.edu/Training/Tutorials/science/topology/topology-html/node4.html})
+\item{Developing Topology and Parameter Files}: \url{http://www.ks.uiuc.edu/Training/Tutorials/science/force field-tutorial/force field-html/node6.html}
+\item{NAMD Tutorial}: Topology Files (\url{http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node25.html}) \\
+\end{itemize}
 
-\colorbox{yellow}{\texttt{NOTE:}} Links are courtesy of UIUC.\\\\
-\colorbox{red}{\texttt{Warning:}} In order to make topology file for a linear molecule such as water, it needs to be sure that atoms are generated and bonded in a linear order. Otherwise CBMC algorithm would fail. However, for branch molecules, any order can be used to generate and bond the atoms of a molecule.\\
-Here's an example of a residue definition for water:\\\\
-\colorbox{lightgray}{
-\begin{tabular}{l}
-\texttt{RESI SPCE ~~ 0.00 ! SPC/E water}\\
-\texttt{GROUP}\\
-\texttt{ATOM H1 HO    0.4238 !  ~ O1}\\
-\texttt{ATOM O1 OH   -0.8476 !   H1~H2}\\
-\texttt{ATOM H2 HO    0.4238 !   }\\
-\texttt{BOND H1 O1  O1 H2 }\\
-\texttt{PATCHING FIRS NONE LAST NONE}
-\end{tabular}}\\\\
-
+%PARAMETER FILE
 \subsection{Parameter File(s):}
 Currently, GOMC uses a single parameter file and the user has the two kinds of parameter file choices:
 \begin{itemize}
@@ -1055,9 +1028,9 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\item Value 1: $<BOOLEAN>$ - ``True'' enabling pressure calculation during the simulation, ``false'' disabling pressure calculation.
 	\item Value 2: $<ULONG>$ - The frequency of calculating the pressure.
 	\end{itemize}
-\item [1-4scaling] Defines constant factor to modify 1-4 intra-molecule coulomb interaction.
+\item [1-4scaling] Defines constant factor to modify intra-molecule coulomb interaction.
 	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - A fraction number between 0.0 and 1.0 that sets 1-4 scaling factor.
+	\item Value 1: $<DOUBLE>$ - A fraction number between 0.0 and 1.0.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} \texttt{CHARMM} force field uses a value between 0.0 and 1.0. In \texttt{MARTINI} force field, it needs to be set to 1.0 because 1-4 interaction will not be modified in this force field.\\
 	\colorbox{lightgray}{
@@ -1123,34 +1096,39 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\end{tabular}}
 \item [DisFreq] Fractional percentage at which displacement move will occur.
 	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - \% displace
+	\item Value 1: $<DOUBLE>$ - \% Displacement
 	\end{itemize}
 \item [RotFreq] Fractional percentage at which rigid rotation move will occur.
 	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - \% rotate
+	\item Value 1: $<DOUBLE>$ - \% Rotatation
 	\end{itemize}
-\item [IntraSwapFreq] Fractional percentage at which particle will be removed from a box and inserted into the same box.
+\item [IntraSwapFreq] Fractional percentage at which particle will be removed from a box and inserted into the same box using configurational bias algorithm.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% Intra molecule swap
 	\end{itemize}
-\item [VolFreq] (\colorbox{cyan}{For isobaric-isothermal ensemble and Gibbs ensemble runs only}) Fractional percentage at which volume displacement move will occur.
+\item [RegrowthFreq] Fractional percentage at which part of the molecule will be deleted and then regrown using configurational bias algorithm.
 	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - \% of volumen swaps
+	\item Value 1: $<DOUBLE>$ - \% Molecular growth
+	\end{itemize}
+\item [VolFreq] (\colorbox{cyan}{For isobaric-isothermal ensemble and Gibbs ensemble runs only}) Fractional percentage at which particle will be removed from one box and inserted into the other box using configurational bias algorithm.
+	\begin{itemize}
+	\item Value 1: $<DOUBLE>$ - \% Volume swaps
 	\end{itemize}
 \item [SwapFreq] (\colorbox{cyan}{For Gibbs and Grand Canonical (GC) ensemble runs only}) Fractional percentage at which particle swap move will occur.
 	\begin{itemize}
-	\item Value 1: $<DOUBLE>$ - \% of molecule swaps
+	\item Value 1: $<DOUBLE>$ - \% Molecule swaps
 	\end{itemize}
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{\#  MOVE FREQEUNCY}\\
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-	\texttt{DisFreq   0.59}\\
+	\texttt{DisFreq   0.49}\\
 	\texttt{RotFreq   0.10}\\
 	\texttt{VolFreq   0.01}\\
 	\texttt{SwapFreq   0.20}\\
 	\texttt{IntraSwapFreq   0.10}\\
+	\texttt{RegrowthFreq   0.10}\\
 	\end{tabular}}\\\\
 	\colorbox{yellow}{\texttt{NOTE:}} All move percentages should add up to 1.0; otherwise, the program will terminate.
 	
@@ -1199,11 +1177,11 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	
 	\colorbox{red}{\texttt{Warning:}} In case of \texttt{Restart   true}, box dimension does not need to be specified. If it is specified, program will read it but it will be ignored and replaced by the printed cell dimensions and angles in the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb and OutputName\_BOX\_1\_restart.pdb). \\
 	
-\item [CBMC\_First] Number of CBMC trials to choose the first seed position (Lennard-Jones trials for first seed growth)
+\item [CBMC\_First] Number of CBMC trials to choose the first atom position (Lennard-Jones trials for first seed growth)
 	\begin{itemize}
 	\item Value 1: $<INTEGER>$ - Number of initial insertion sites to try
 	\end{itemize}
-\item [CBMC\_Nth] Number of CBMC trials to choose the later seed positions (Lennard-Jones trials for first seed growth)
+\item [CBMC\_Nth] Number of CBMC trials to choose the later atom positions (Lennard-Jones trials for first seed growth)
 	\begin{itemize}
 	\item Value 1: $<INTEGER>$ - Number of LJ trials for growing later atom positions
 	\end{itemize}
@@ -1275,6 +1253,7 @@ If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ense
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables printing histogram; ``false'' disables it.
 	\item Value 2: $<ULONG>$ - Number of steps per histogram output file. If this keyword cannot be found in the configuration file, a value will be assigned by default to dump 1000 output for \texttt{RunSteps} greater than 1000 steps and 100 output for \texttt{RunSteps} less than 1000 steps.
 	\end{itemize}
+	
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1508,16 +1487,19 @@ Next, six files need to be made:
 \item Two TCL scripts to input into PSFGen to generate the final configuration
 \end{itemize}
 \textbf{isobutane.pdb}\\
+
 \colorbox{lightgray}{
-\begin{tabular}{l}
-\texttt{REMARK   1 File created by GaussView 5.0.8}\\
-\texttt{ATOM      1 C1   ISB     1       0.911  -0.313   0.000		C}\\
-\texttt{ATOM      2 C2   ISB     1       1.424  -1.765   0.000		C}\\
-\texttt{ATOM      3 C3   ISB     1      -0.629  -0.313   0.000		C}\\
-\texttt{ATOM      4 C4   ISB     1       1.424   0.413  -1.257		C}\\
-\texttt{END}\\
-\end{tabular}}\\\\
-\newline
+\begin{tabular}{l *{8}{r}}
+  \texttt{REMARK} & \texttt{1 File} & \texttt{created}  & \texttt{by} & \texttt{GaussView} & \texttt{5.0.8} & & & \\
+  \texttt{ATOM} & \texttt{1} & \texttt{C1} & \texttt{ISB} & \texttt{1} & \texttt{0.911} & \texttt{-0.313} & \texttt{0.000}  & \texttt{C} \\
+  \texttt{ATOM} & \texttt{2} & \texttt{C2} & \texttt{ISB} & \texttt{1} & \texttt{1.424} & \texttt{-1.765} & \texttt{0.000}  & \texttt{C} \\
+  \texttt{ATOM} & \texttt{3} & \texttt{C3} & \texttt{ISB} & \texttt{1} & \texttt{-0.629} & \texttt{-0.313} & \texttt{0.000}  & \texttt{C} \\
+  \texttt{ATOM} & \texttt{4} & \texttt{C4} & \texttt{ISB} & \texttt{1} & \texttt{1.424} & \texttt{0.413} & \texttt{-1.257} & \texttt{C} \\
+  \multicolumn{9}{l}{\texttt{END}} \\
+\end{tabular} 
+} \\\\
+
+
 \textbf{Top\_Branched\_Alkane.inp}\\
 \colorbox{lightgray}{
 \begin{tabular}{l}
@@ -1638,6 +1620,8 @@ Progress can be monitored in the terminal with the tail command:\\
 \caption{Repeating this process for multiple temperatures will allow you to obtain the following results.}
 \end{figure}
 \newpage
+
+%ntermolecular Energy
 \section{Intermolecular Energy and Virial function (Van der Waals)}
 In this section, the virial and energy equation of Van der Waals interaction for different potential function are discussed in details.
 \subsection{VDW} This option calculates potential energy without any truncation.
@@ -1765,7 +1749,7 @@ Using the \texttt{SWITCH} potential function defined for \texttt{MARTINI} force 
 	\begin{equation}
 	W_{ij}(\texttt{switch}) = C_{n_{ij}}\epsilon_{ij} \Bigg[ {\sigma_{ij}}^{n} \bigg(\frac{n}{{r_{ij}}^{(n+1)}} + d\varphi_{n} (r_{ij}) \bigg) - {\sigma_{ij}}^{6} \bigg(\frac{6}{{r_{ij}}^{(6+1)}} +d \varphi_{6} (r_{ij}) \bigg) \Bigg]\times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
 	\end{equation}
-The constants defined in Eq. 11-13 and the factor $d\varphi_{\alpha}$ defined as:
+The constants defined in Eq. 14-16 and the factor $d\varphi_{\alpha}$ defined as:
 \[
 	d\varphi_{\alpha}(r_{ij}) = 
 	\begin{cases}
@@ -1890,7 +1874,7 @@ In this section, the virial and energy equation of electrostatic interaction for
 	\begin{equation}
 		W(\texttt{SWITCH}) =  \frac{q_i q_j}{4\pi \epsilon_0 \epsilon_1} \bigg( \frac{1}{{r_{ij}}^2} + d\varphi_1 (r_{ij})  \bigg) \times \frac{\overrightarrow{r_{ij}}}{r_{ij}}
 	\end{equation}
-	, where $\varphi_1 (r_{ij})$ is defined in Eq. 18.	
+	, where $d\varphi_1 (r_{ij})$ is defined in Eq. 18.	
 \end{itemize}
 \newpage
 

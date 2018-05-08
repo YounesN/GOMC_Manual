@@ -23,30 +23,30 @@
 \contentsline {subsubsection}{\numberline {7.2.2}Generating PSF file}{17}{subsubsection.7.2.2}
 \contentsline {subsection}{\numberline {7.3}Topology File}{18}{subsection.7.3}
 \contentsline {subsection}{\numberline {7.4}Parameter File(s):}{19}{subsection.7.4}
-\contentsline {subsubsection}{\numberline {7.4.1}BONDS}{22}{subsubsection.7.4.1}
+\contentsline {subsubsection}{\numberline {7.4.1}BONDS}{21}{subsubsection.7.4.1}
 \contentsline {subsubsection}{\numberline {7.4.2}ANGLES}{22}{subsubsection.7.4.2}
-\contentsline {subsubsection}{\numberline {7.4.3}DIHEDRALS}{23}{subsubsection.7.4.3}
+\contentsline {subsubsection}{\numberline {7.4.3}DIHEDRALS}{22}{subsubsection.7.4.3}
 \contentsline {subsubsection}{\numberline {7.4.4}IMPROPERS}{23}{subsubsection.7.4.4}
-\contentsline {subsubsection}{\numberline {7.4.5}NONBONDED}{24}{subsubsection.7.4.5}
-\contentsline {subsubsection}{\numberline {7.4.6}NBFIX}{24}{subsubsection.7.4.6}
-\contentsline {subsection}{\numberline {7.5}Exotic Parameter file}{25}{subsection.7.5}
-\contentsline {subsection}{\numberline {7.6}Control File (*.conf)}{26}{subsection.7.6}
-\contentsline {subsubsection}{\numberline {7.6.1}Input/Simulation Setup}{26}{subsubsection.7.6.1}
-\contentsline {subsubsection}{\numberline {7.6.2}System Settings for During Run Setup}{28}{subsubsection.7.6.2}
-\contentsline {subsubsection}{\numberline {7.6.3}Output Controls}{34}{subsubsection.7.6.3}
-\contentsline {section}{\numberline {8}GOMC's Output Files, Terminal Output}{38}{section.8}
-\contentsline {subsection}{\numberline {8.1}Console Output}{38}{subsection.8.1}
-\contentsline {subsection}{\numberline {8.2}Block Output Files}{43}{subsection.8.2}
-\contentsline {subsection}{\numberline {8.3}Visualizing Simulation}{44}{subsection.8.3}
-\contentsline {section}{\numberline {9}Putting it all together: Running a GOMC Simulation}{45}{section.9}
-\contentsline {section}{\numberline {10}Intermolecular Energy and Virial function (Van der Waals)}{49}{section.10}
-\contentsline {subsection}{\numberline {10.1}VDW}{49}{subsection.10.1}
-\contentsline {subsection}{\numberline {10.2}SHIFT}{49}{subsection.10.2}
-\contentsline {subsection}{\numberline {10.3}SWITCH}{50}{subsection.10.3}
-\contentsline {subsection}{\numberline {10.4}SWITCH (MARTINI)}{51}{subsection.10.4}
-\contentsline {section}{\numberline {11}Intermolecular Energy and Virial function (Electrostatic)}{53}{section.11}
-\contentsline {subsection}{\numberline {11.1}Ewald}{53}{subsection.11.1}
-\contentsline {subsection}{\numberline {11.2}SHIFT}{54}{subsection.11.2}
-\contentsline {subsection}{\numberline {11.3}SWITCH}{54}{subsection.11.3}
-\contentsline {subsection}{\numberline {11.4}SWITCH (MARTINI)}{55}{subsection.11.4}
-\contentsline {section}{\numberline {12}Get Help or Technical Support }{56}{section.12}
+\contentsline {subsubsection}{\numberline {7.4.5}NONBONDED}{23}{subsubsection.7.4.5}
+\contentsline {subsubsection}{\numberline {7.4.6}NBFIX}{23}{subsubsection.7.4.6}
+\contentsline {subsection}{\numberline {7.5}Exotic Parameter file}{24}{subsection.7.5}
+\contentsline {subsection}{\numberline {7.6}Control File (*.conf)}{25}{subsection.7.6}
+\contentsline {subsubsection}{\numberline {7.6.1}Input/Simulation Setup}{25}{subsubsection.7.6.1}
+\contentsline {subsubsection}{\numberline {7.6.2}System Settings for During Run Setup}{27}{subsubsection.7.6.2}
+\contentsline {subsubsection}{\numberline {7.6.3}Output Controls}{33}{subsubsection.7.6.3}
+\contentsline {section}{\numberline {8}GOMC's Output Files, Terminal Output}{37}{section.8}
+\contentsline {subsection}{\numberline {8.1}Console Output}{37}{subsection.8.1}
+\contentsline {subsection}{\numberline {8.2}Block Output Files}{42}{subsection.8.2}
+\contentsline {subsection}{\numberline {8.3}Visualizing Simulation}{43}{subsection.8.3}
+\contentsline {section}{\numberline {9}Putting it all together: Running a GOMC Simulation}{44}{section.9}
+\contentsline {section}{\numberline {10}Intermolecular Energy and Virial function (Van der Waals)}{48}{section.10}
+\contentsline {subsection}{\numberline {10.1}VDW}{48}{subsection.10.1}
+\contentsline {subsection}{\numberline {10.2}SHIFT}{48}{subsection.10.2}
+\contentsline {subsection}{\numberline {10.3}SWITCH}{49}{subsection.10.3}
+\contentsline {subsection}{\numberline {10.4}SWITCH (MARTINI)}{50}{subsection.10.4}
+\contentsline {section}{\numberline {11}Intermolecular Energy and Virial function (Electrostatic)}{52}{section.11}
+\contentsline {subsection}{\numberline {11.1}Ewald}{52}{subsection.11.1}
+\contentsline {subsection}{\numberline {11.2}SHIFT}{53}{subsection.11.2}
+\contentsline {subsection}{\numberline {11.3}SWITCH}{53}{subsection.11.3}
+\contentsline {subsection}{\numberline {11.4}SWITCH (MARTINI)}{54}{subsection.11.4}
+\contentsline {section}{\numberline {12}Get Help or Technical Support }{55}{section.12}
