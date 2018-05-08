@@ -19,12 +19,14 @@
 \contentsline {subsubsection}{\numberline {7.1.1}What is PDB file}{13}{subsubsection.7.1.1}
 \contentsline {subsubsection}{\numberline {7.1.2}Generating PDB file}{15}{subsubsection.7.1.2}
 \contentsline {subsection}{\numberline {7.2}PSF File}{15}{subsection.7.2}
+\contentsline {subsubsection}{\numberline {7.2.1}What is PSF file}{16}{subsubsection.7.2.1}
+\contentsline {subsubsection}{\numberline {7.2.2}Generating PSF file}{17}{subsubsection.7.2.2}
 \contentsline {subsection}{\numberline {7.3}Topology File}{18}{subsection.7.3}
-\contentsline {subsection}{\numberline {7.4}Parameter File(s):}{20}{subsection.7.4}
+\contentsline {subsection}{\numberline {7.4}Parameter File(s):}{19}{subsection.7.4}
 \contentsline {subsubsection}{\numberline {7.4.1}BONDS}{22}{subsubsection.7.4.1}
-\contentsline {subsubsection}{\numberline {7.4.2}ANGLES}{23}{subsubsection.7.4.2}
+\contentsline {subsubsection}{\numberline {7.4.2}ANGLES}{22}{subsubsection.7.4.2}
 \contentsline {subsubsection}{\numberline {7.4.3}DIHEDRALS}{23}{subsubsection.7.4.3}
-\contentsline {subsubsection}{\numberline {7.4.4}IMPROPERS}{24}{subsubsection.7.4.4}
+\contentsline {subsubsection}{\numberline {7.4.4}IMPROPERS}{23}{subsubsection.7.4.4}
 \contentsline {subsubsection}{\numberline {7.4.5}NONBONDED}{24}{subsubsection.7.4.5}
 \contentsline {subsubsection}{\numberline {7.4.6}NBFIX}{24}{subsubsection.7.4.6}
 \contentsline {subsection}{\numberline {7.5}Exotic Parameter file}{25}{subsection.7.5}
