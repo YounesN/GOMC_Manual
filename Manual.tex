@@ -360,7 +360,7 @@ The atom name is ``C1" and residue name is ``ISB". The PSF file (next section) c
 \colorbox{red}{Important}: NOTE on PDB Format Conventions:
 \begin{itemize}
 \item VMD requires a constant number of ATOMs in a multi-frame PDB (multiple records terminated by ``END" in a single file). To compensate for this, all atoms from all boxes in the system are written to the output PDBs of this code.
-\item For atoms not currently in a box, the coordinates are set to $<0.00, 0.00, 0.00>$. The occupancy is commonly just set to ``1.00" and is left unused by many codes. We recycle this legacy parameter by using it to denote, in our output PDBs, the box a particle is in (box 0  occupancy=0.00 ; box 1  occupancy=1.00)
+\item For atoms not currently in a box, the coordinates are set to $<0.00, 0.00, 0.00>$. The occupancy is commonly just set to ``1.00" and is left unused by many codes. We recycle this legacy parameter by using it to denote, in our output PDBs, the box a molecule is in (box 0  occupancy=0.00 ; box 1  occupancy=1.00)
 \item{The beta value in GOMC code is used to define the mobility of the molecule. }
 	\subitem \textbf{Beta  = 0.00}: molecule can move and transfer within and between boxes.
 	\subitem \textbf{Beta = 1.00}: molecule is fixed in its position.
@@ -748,30 +748,23 @@ The control file is GOMC's proprietary input file. It contains key settings. The
 \subsubsection{Input/Simulation Setup}
 In this section, input file names are listed. In addition, if you want to restart your simulation or use integer seed for running your simulation, you need to modify this section according to your purpose.
 \begin{description}
-\item [Restart] Determines whether to restart the simulation from previous simulation or not.\\
+\item [Restart] Determines whether to restart the simulation from previous simulation or not.
 	\begin{itemize}
-	\item Value 1: $<BOOLEAN>$ - true if restart, false otherwise\\
+	\item Value 1: $<BOOLEAN>$ - true if restart, false otherwise.
 	\end{itemize}
 \item [PRNG] Dictates how to start the pseudo-random number generator (PRNG)
 	\begin{itemize}
 	\item Value 1: $<STRING>$
 		\begin{itemize}
-		\item \texttt{RANDOM}: Randomizes Mersenne Twister PRNG with random bits based on the system time.
+		\item \texttt{RANDOM}: Randomizes Mersenne Twister PRNG with random bits based on the system time. \\
 		\colorbox{lightgray}{
 		\begin{tabular}{l}
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{\# kind \{RANDOM, INTSEED\}}\\
 		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 		\texttt{PRNG RANDOM}\\
-		\end{tabular}}
-		\item \texttt{INTSEED}: This option ``seeds" the Mersenne Twister PRNG with a standard integer. When the same integer is used, the generated PRNG stream should be the same every time, which is helpful in tracking down bugs.\\
-		\colorbox{lightgray}{
-		\begin{tabular}{l}
-		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{\# kind \{RANDOM, INTSEED\}}\\
-		\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
-		\texttt{PRNG INTSEED}\\
-		\end{tabular}}
+		\end{tabular}} \\
+		\item \texttt{INTSEED}: This option ``seeds" the Mersenne Twister PRNG with a standard integer. When the same integer is used, the generated PRNG stream should be the same every time, which is helpful in tracking down bugs.
 		\end{itemize}
 	\end{itemize}
 \item [Random\_Seed] Defines the seed number. If ``INTSEED" is chosen, seed number needs to be specified; otherwise, the program will terminate.
@@ -831,12 +824,12 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{Parameters ../../common/Par\_TraPPE\_Alkanes.inp}\\
 	\end{tabular}}
 	\end{itemize}
-\item [Coordinates] Defines the PDB filenames (coordinates) for each box in the system.
+\item [Coordinates] Defines the PDB file names (coordinates) and location for each box in the system.
 	\begin{itemize}	
-	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0').\\
-	\item Value 2: $<STRING>$ - Sets PDB file name\\\\
+	\item Value 1: $<INTEGER>$ - Sets box number (first box is box '0').\\
+	\item Value 2: $<STRING>$ - Sets the name for PDB file.\\\\
 	\colorbox{yellow}{\texttt{NOTE:}} NVT and NPT ensembles requires only one PDB file and GEMC/GCMC requires two PDB files. If the number of PDB files is not compatible with the simulation type, the program will terminate. \\\\
-	Example of NVT or NPT ensemble\\
+	Example of NVT or NPT ensemble:\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -844,7 +837,7 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{Coordinates 0 STEP3\_START\_ISB\_sys.pdb}\\
 	\end{tabular}}\\\\
-	Example of Gibbs or GC ensemble\\
+	Example of Gibbs or GC ensemble:\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -852,10 +845,10 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{Coordinates 0 STEP3\_START\_ISB\_sys\_BOX\_0.pdb}\\
 	\texttt{Coordinates 1 STEP3\_START\_ISB\_sys\_BOX\_1.pdb}\\
-	\end{tabular}}
+	\end{tabular}} \\
 	
 	\colorbox{yellow}{\texttt{NOTE:}} In case of \texttt{Restart   true}, the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb) can be used for each boxe. \\\\
-	Example of Gibbs ensemble when \texttt{Restart} mode is active\\
+	Example of Gibbs ensemble when \texttt{Restart} mode is active:\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -869,10 +862,10 @@ In this section, input file names are listed. In addition, if you want to restar
 \item [Structures] Defines the PSF filenames (structures) for each box in the system.
 	\begin{itemize}	
 	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0').\\
-	\item Value 2: $<STRING>$ - Sets PSF file name\\\\
+	\item Value 2: $<STRING>$ - Sets the name for PSF file.\\\\
 	\colorbox{yellow}{\texttt{NOTE:}} NVT and NPT ensembles requires only one PSF file and GEMC/GCMC requires two PSF files. If the number of PSF files is not compatible with the simulation type, the program will terminate. \\
 	
-	Example of NVT or NPT ensemble\\
+	Example of NVT or NPT ensemble:\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -880,7 +873,7 @@ In this section, input file names are listed. In addition, if you want to restar
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
 	\texttt{Structure 0 STEP3\_START\_ISB\_sys.psf}\\
 	\end{tabular}}\\\\
-	Example of Gibbs or GC ensemble\\
+	Example of Gibbs or GC ensemble:\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -891,7 +884,7 @@ In this section, input file names are listed. In addition, if you want to restar
 	\end{tabular}}
 	
 	\colorbox{yellow}{\texttt{NOTE:}} In case of \texttt{Restart   true}, the PSF output file from GOMC (OutputName\_merged.psf) can be used for both boxes. \\\\
-	Example of Gibbs ensemble when Restart mode is active\\
+	Example of Gibbs ensemble when Restart mode is active:\\
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
 	\texttt{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}\\
@@ -1102,7 +1095,7 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% Rotatation
 	\end{itemize}
-\item [IntraSwapFreq] Fractional percentage at which particle will be removed from a box and inserted into the same box using configurational bias algorithm.
+\item [IntraSwapFreq] Fractional percentage at which molecule will be removed from a box and inserted into the same box using configurational bias algorithm.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% Intra molecule swap
 	\end{itemize}
@@ -1110,11 +1103,11 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% Molecular growth
 	\end{itemize}
-\item [VolFreq] (\colorbox{cyan}{For isobaric-isothermal ensemble and Gibbs ensemble runs only}) Fractional percentage at which particle will be removed from one box and inserted into the other box using configurational bias algorithm.
+\item [VolFreq] (\colorbox{cyan}{For isobaric-isothermal ensemble and Gibbs ensemble runs only}) Fractional percentage at which molecule will be removed from one box and inserted into the other box using configurational bias algorithm.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% Volume swaps
 	\end{itemize}
-\item [SwapFreq] (\colorbox{cyan}{For Gibbs and Grand Canonical (GC) ensemble runs only}) Fractional percentage at which particle swap move will occur.
+\item [SwapFreq] (\colorbox{cyan}{For Gibbs and Grand Canonical (GC) ensemble runs only}) Fractional percentage at which molecule swap move will occur.
 	\begin{itemize}
 	\item Value 1: $<DOUBLE>$ - \% Molecule swaps
 	\end{itemize}
@@ -1145,10 +1138,10 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 
 \item [CellBasisVector] Defines the shape and size of the simulation periodic cell. \texttt{CellBasisVector1}, \texttt{CellBasisVector2}, \texttt{CellBasisVector3} represent the cell basis vector $a, b, c$, respectively. This tag may occur multiple times.  It occurs once for \texttt{NVT} and \texttt{NPT}, but twice for Gibbs ensemble or GC ensemble.
 	\begin{itemize}
-	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0')
-	\item Value 2: $<DOUBLE>$ - x value of cell basis vector in Angstroms
-	\item Value 3: $<DOUBLE>$ - y value of cell basis vector in Angstroms
-	\item Value 4: $<DOUBLE>$ - z value of cell basis vector in Angstroms
+	\item Value 1: $<INTEGER>$ - Sets box number (first box is box `0').
+	\item Value 2: $<DOUBLE>$ - x value of cell basis vector in Angstroms.
+	\item Value 3: $<DOUBLE>$ - y value of cell basis vector in Angstroms.
+	\item Value 4: $<DOUBLE>$ - z value of cell basis vector in Angstroms.
 	\end{itemize}
 	\colorbox{yellow}{\texttt{NOTE:}} If the number of defined boxes were not compatible to simulation type, the program will be terminated.\\\\
 	Example for \texttt{NVT} and \texttt{NPT} ensemble. In this example, each vector is perpendicular to the other two ($\alpha = 90, \beta = 90, \gamma = 90$), as indicated by a single x, y, or z value being specified by each and making a rectangular 3-D box:\\\\
@@ -1177,21 +1170,21 @@ Note that some tags, or entries for tags, are only used in certain ensembles (e.
 	
 	\colorbox{red}{\texttt{Warning:}} In case of \texttt{Restart   true}, box dimension does not need to be specified. If it is specified, program will read it but it will be ignored and replaced by the printed cell dimensions and angles in the restart PDB output file from GOMC (OutputName\_BOX\_0\_restart.pdb and OutputName\_BOX\_1\_restart.pdb). \\
 	
-\item [CBMC\_First] Number of CBMC trials to choose the first atom position (Lennard-Jones trials for first seed growth)
+\item [CBMC\_First] Number of CBMC trials to choose the first atom position (Lennard-Jones trials for first seed growth).
 	\begin{itemize}
-	\item Value 1: $<INTEGER>$ - Number of initial insertion sites to try
+	\item Value 1: $<INTEGER>$ - Number of initial insertion sites to try.
 	\end{itemize}
-\item [CBMC\_Nth] Number of CBMC trials to choose the later atom positions (Lennard-Jones trials for first seed growth)
+\item [CBMC\_Nth] Number of CBMC trials to choose the later atom positions (Lennard-Jones trials for first seed growth).
 	\begin{itemize}
-	\item Value 1: $<INTEGER>$ - Number of LJ trials for growing later atom positions
+	\item Value 1: $<INTEGER>$ - Number of LJ trials for growing later atom positions.
 	\end{itemize}
-\item [CBMC\_Ang] Number of CBMC bending angle trials to perform for geometry (per the coupled-decoupled CBMC scheme)
+\item [CBMC\_Ang] Number of CBMC bending angle trials to perform for geometry (per the coupled-decoupled CBMC scheme).
 	\begin{itemize}
-	\item Value 1: $<INTEGER>$ - Number of trials per angle 
+	\item Value 1: $<INTEGER>$ - Number of trials per angle.
 	\end{itemize}
-\item [CBMC\_Dih] Number of CBMC dihedral angle trials to perform for geometry (per the coupled-decoupled CBMC scheme)
+\item [CBMC\_Dih] Number of CBMC dihedral angle trials to perform for geometry (per the coupled-decoupled CBMC scheme).
 	\begin{itemize}
-	\item Value 1: $<INTEGER>$ - Number of trials per dihedral
+	\item Value 1: $<INTEGER>$ - Number of trials per dihedral.
 	\end{itemize}
 	\colorbox{lightgray}{
 	\begin{tabular}{l}
@@ -1248,7 +1241,7 @@ If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ense
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables printing block average; ``false'' disables it.
 	\item Value 2: $<ULONG>$ - Number of steps per block-average output file. If this keyword cannot be found in the configuration file, its value will be assigned a default to dump 100 output.
 	\end{itemize}
-\item [HistogramFreq] Controls the histograms. Histograms are a binned listing of observation frequency for a specific thermodynamic variable.  In this code, they also control the output of a file containing energy/particle samples; it only will be used in GC ensemble simulations for histogram reweighting purposes.
+\item [HistogramFreq] Controls the histograms. Histograms are a binned listing of observation frequency for a specific thermodynamic variable.  In this code, they also control the output of a file containing energy/molecule samples; it only will be used in GC ensemble simulations for histogram reweighting purposes.
 	\begin{itemize}
 	\item Value 1: $<BOOLEAN>$ - ``true'' enables printing histogram; ``false'' disables it.
 	\item Value 2: $<ULONG>$ - Number of steps per histogram output file. If this keyword cannot be found in the configuration file, a value will be assigned by default to dump 1000 output for \texttt{RunSteps} greater than 1000 steps and 100 output for \texttt{RunSteps} less than 1000 steps.
@@ -1266,15 +1259,15 @@ If PDB dumping was enabled, one file for NVT or NPT and two files for Gibbs ense
 	\texttt{HistogramFreq  	 true   10000}\\
 	\end{tabular}}
 \end{description}
-The next section controls the output of the energy/particle sample file and the distribution file for particle counts, commonly referred to as the ``histogram'' output. This section is only required if Grand Canonical ensemble simulation was used.
+The next section controls the output of the energy/molecule sample file and the distribution file for molecule counts, commonly referred to as the ``histogram'' output. This section is only required if Grand Canonical ensemble simulation was used.
 \begin{description}
-\item [DistName] Sets short phrase to naming particle distribution file.
+\item [DistName] Sets short phrase to naming molecule distribution file.
 	\begin{itemize}
-	\item Value 1: $<STRING>$ - Short phrase which will be combined with \texttt{RunNumber} and \texttt{RunLetter} to use in the name of the binned histogram for particle distribution.
+	\item Value 1: $<STRING>$ - Short phrase which will be combined with \texttt{RunNumber} and \texttt{RunLetter} to use in the name of the binned histogram for molecule distribution.
 	\end{itemize}
 \item [HistName] Sets short phrase to naming energy sample file.
 	\begin{itemize}
-	\item Value 1: $<STRING>$ - Short phrase, which will be combined with \texttt{RunNumber} and \texttt{RunLetter}, to use in the name of the energy/particle count sample file.
+	\item Value 1: $<STRING>$ - Short phrase, which will be combined with \texttt{RunNumber} and \texttt{RunLetter}, to use in the name of the energy/molecule count sample file.
 	\end{itemize}
 \item [RunNumber] Sets a number, which is a part of \texttt{DistName} and \texttt{HistName} file name.
 	\begin{itemize}
@@ -1381,7 +1374,7 @@ Here, ``output\_console.log'' is the console output file and ``\$3'' represents 
 	\gamma = \frac{1}{2A_{xy}} \int_{0}^{L} \bigg(P_{zz} - \frac{P_{xx} + P_{yy}}{2} \bigg) dz
 \end{equation}
 
-The first section of this console output typically includes some information relating the system, CPU, GPU, and RAM. In continue, console output includes information regarding the input file (configuration file), force field reading, summary of the structure of the molecule, bonded parameter, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)\\\\
+The first section of this console output typically includes some information relating the system, CPU, GPU, and RAM. In continue, console output includes information regarding the input file (configuration file), force field reading, summary of the structure of the molecule, bonded and non-bonded parameters, and minimum and maximum coordinate of molecules. This output is important; it may contain text relating to issues encountered if there was an error in the current run (e.g. a bad parameter, unknown keyword, missing parameters in the configuration file, etc.)\\\\
 
 \begin{figure}[H]
 \includegraphics[scale=0.7]{images/out1}
@@ -1389,15 +1382,18 @@ The first section of this console output typically includes some information rel
 \begin{figure}[H]
 \includegraphics[scale=0.7]{images/out2}
 \end{figure}
-\newpage
-Next, the energy and statistic title, initial energy and statistic of the system's starting configuration will print:\\
-\colorbox{yellow}{\texttt{NOTE:}} If total energy of simulation is greater that $1.0 e^{14}$, \texttt{System Total Energy Calculation} will be performed at \texttt{EqSteps} to preserve energy value.
 \begin{figure}[H]
 \includegraphics[scale=0.7]{images/out3}
 \end{figure}
-After the simulation starts, move, energy, and statistical title, followed by their values for each simulation box, will print:
+\newpage
+Next, the energy and statistic title, initial energy and statistic of the system's starting configuration will print:\\
+\colorbox{yellow}{\texttt{NOTE:}} If total energy of simulation is greater that $1.0 e^{12}$, \texttt{System Total Energy Calculation} will be performed at \texttt{EqSteps} to preserve energy value.
 \begin{figure}[H]
 \includegraphics[scale=0.7]{images/out4}
+\end{figure}
+After the simulation starts, move, energy, and statistical title, followed by their values for each simulation box, will print:
+\begin{figure}[H]
+\includegraphics[scale=0.7]{images/out5}
 \end{figure}
 At the end of the run, timing information and other wrap up info will be printed.\\\\
 \colorbox{yellow}{\texttt{NOTE:}} Printed energy and statistical values are instantaneous values.\\
